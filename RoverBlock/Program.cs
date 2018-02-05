@@ -54,14 +54,8 @@ namespace RoverBlock
             foreach (Student s in students)
             {
                 Console.WriteLine("ID: " + s.NetworkID);
-                if (s.A != null)
-                {
-                    Console.WriteLine("A: " + s.A.Name);
-                }
-                if (s.B != null)
-                {
-                    Console.WriteLine("B: " + s.B.Name);
-                }
+                Console.WriteLine("A: " + (s.A == null ? "null" : s.A.Name));
+                Console.WriteLine("B: " + (s.B == null ? "null" : s.B.Name));
                 Console.WriteLine(String.Join(", ", s.Choices));
                 Console.WriteLine();
             }

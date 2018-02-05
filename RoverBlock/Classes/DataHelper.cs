@@ -15,24 +15,10 @@ namespace RoverBlock.Classes
         {
             List<LockedStudent> lockedStudents = new List<LockedStudent>();
 
-            HSSFWorkbook hssfwb;
-            using (FileStream file = new FileStream("../../Sheets/" + fileName, FileMode.Open, FileAccess.Read))
+            List<Dictionary<String, String>> sheetData = readSheet(fileName, map);
+            foreach (Dictionary<String, String> entry in sheetData)
             {
-                hssfwb = new HSSFWorkbook(file);
-            }
-
-            ISheet sheet = hssfwb.GetSheetAt(0);
-            for (int row = 1; row <= sheet.LastRowNum; row++)
-            {
-                if (sheet.GetRow(row) != null)
-                {
-                    List<ICell> cells = sheet.GetRow(row).Cells;
-
-                    String NetworkID = cells[map["NetworkID"]].ToString();
-                    String Day = cells[map["Day"]].ToString();
-
-                    lockedStudents.Add(new LockedStudent(NetworkID, Day));
-                }
+                lockedStudents.Add(new LockedStudent(entry["NetworkID"], entry["Day"]));
             }
 
             Block reservedBlock = new Block("RESERVED", 0, 0);
@@ -55,42 +41,31 @@ namespace RoverBlock.Classes
         {
             List<Student> students = new List<Student>();
 
-            HSSFWorkbook hssfwb;
-            using (FileStream file = new FileStream("../../Sheets/" + fileName, FileMode.Open, FileAccess.Read))
+            List<Dictionary<String, String>> sheetData = readSheet(fileName, map);
+            foreach (Dictionary<String, String> entry in sheetData)
             {
-                hssfwb = new HSSFWorkbook(file);
-            }
-
-            ISheet sheet = hssfwb.GetSheetAt(0);
-            for (int row = 1; row <= sheet.LastRowNum; row++)
-            {
-                if (sheet.GetRow(row) != null)
+                String NetworkID = entry["NetworkID"];
+                List<String> choices = new List<String>()
                 {
-                    List<ICell> cells = sheet.GetRow(row).Cells;
+                    entry["Choice 1"],
+                    entry["Choice 2"],
+                    entry["Choice 3"]
+                }.Distinct().ToList();
 
-                    String NetworkID = cells[map["NetworkID"]].ToString();
-                    List<String> choices = new List<String>()
-                    {
-                        cells[map["Choice 1"]].ToString(),
-                        cells[map["Choice 2"]].ToString(),
-                        cells[map["Choice 3"]].ToString()
-                    }.Distinct().ToList();
+                // TODO: use an intersect here. that would solve the duplicate issue and "promote" choices if the class does not exist
 
-                    // TODO: use an intersect here. that would solve the duplicate issue and "promote" choices if the class does not exist
+                // reuse Student object from locked students to preserve RESERVED classes
+                Student s = lockedStudents.Where(x => x.NetworkID == NetworkID).SingleOrDefault();
 
-                    // reuse Student object from locked students to preserve RESERVED classes
-                    Student s = lockedStudents.Where(x => x.NetworkID == NetworkID).SingleOrDefault();
-
-                    // if no student matched, create a new one
-                    if (s == null)
-                    {
-                        s = new Student(NetworkID, null, null);
-                    }
-
-                    s.Choices = choices;
-
-                    students.Add(s);
+                // if no student matched, create a new one
+                if (s == null)
+                {
+                    s = new Student(NetworkID, null, null);
                 }
+
+                s.Choices = choices;
+
+                students.Add(s);
             }
 
             return students;
@@ -100,25 +75,14 @@ namespace RoverBlock.Classes
         {
             List<Block> blocks = new List<Block>();
 
-            HSSFWorkbook hssfwb;
-            using (FileStream file = new FileStream("../../Sheets/" + fileName, FileMode.Open, FileAccess.Read))
+            List<Dictionary<String, String>> sheetData = readSheet(fileName, map);
+            foreach (Dictionary<String, String> entry in sheetData)
             {
-                hssfwb = new HSSFWorkbook(file);
-            }
+                String BlockName = entry["Class Name"];
+                int aSlots = tryParse(entry["A Slots"]);
+                int bSlots = tryParse(entry["B Slots"]);
 
-            ISheet sheet = hssfwb.GetSheetAt(0);
-            for (int row = 1; row <= sheet.LastRowNum; row++)
-            {
-                if (sheet.GetRow(row) != null)
-                {
-                    List<ICell> cells = sheet.GetRow(row).Cells;
-
-                    String BlockName = cells[map["Class Name"]].ToString();
-                    int aSlots = tryParse(cells[map["A Slots"]].ToString());
-                    int bSlots = tryParse(cells[map["B Slots"]].ToString());
-
-                    blocks.Add(new Block(BlockName, aSlots, bSlots));
-                }
+                blocks.Add(new Block(BlockName, aSlots, bSlots));
             }
 
             shuffle(blocks);
@@ -138,10 +102,9 @@ namespace RoverBlock.Classes
             interestedStudents = null;
             GC.Collect();
 
-            // TODO: check behavior for underfilled classes
             for (int i = 0; i < b.aSlots; i++)
             {
-                if(pool.Count == 0)
+                if (pool.Count == 0)
                 {
                     break;
                 }
@@ -166,7 +129,6 @@ namespace RoverBlock.Classes
             interestedStudents = null;
             GC.Collect();
 
-            // TODO: check behavior for underfilled classes
             for (int i = 0; i < b.bSlots; i++)
             {
                 if (pool.Count == 0)
@@ -180,6 +142,37 @@ namespace RoverBlock.Classes
                 pool.RemoveAll(x => x.NetworkID == winner.NetworkID);
             }
         }
+
+        public List<Dictionary<String, String>> readSheet(String fileName, Dictionary<String, int> map)
+        {
+            List<Dictionary<String, String>> output = new List<Dictionary<String, String>>();
+
+            HSSFWorkbook hssfwb;
+            using (FileStream file = new FileStream("../../Sheets/" + fileName, FileMode.Open, FileAccess.Read))
+            {
+                hssfwb = new HSSFWorkbook(file);
+            }
+
+            ISheet sheet = hssfwb.GetSheetAt(0);
+            for (int row = 1; row <= sheet.LastRowNum; row++)
+            {
+                if (sheet.GetRow(row) != null)
+                {
+                    List<ICell> cells = sheet.GetRow(row).Cells;
+                    Dictionary<String, String> dict = new Dictionary<String, String>();
+
+                    foreach (KeyValuePair<String, int> entry in map)
+                    {
+                        dict.Add(entry.Key, cells[entry.Value].ToString());
+                    }
+
+                    output.Add(dict);
+                }
+            }
+
+            return output;
+        }
+
 
         public int tryParse(String str)
         {

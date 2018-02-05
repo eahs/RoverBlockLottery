@@ -10,3 +10,15 @@ C:\Users\Connor\Desktop\RoverBlock\RoverBlock\bin\Debug\NPOI.OOXML.dll
 C:\Users\Connor\Desktop\RoverBlock\RoverBlock\bin\Debug\NPOI.OpenXml4Net.dll
 C:\Users\Connor\Desktop\RoverBlock\RoverBlock\bin\Debug\NPOI.OpenXmlFormats.dll
 C:\Users\Connor\Desktop\RoverBlock\RoverBlock\bin\Debug\NPOI.xml
+C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\RoverBlock.exe.config
+C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\RoverBlock.exe
+C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\RoverBlock.pdb
+C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\ICSharpCode.SharpZipLib.dll
+C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\NPOI.dll
+C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\NPOI.OOXML.dll
+C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\NPOI.OpenXml4Net.dll
+C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\NPOI.OpenXmlFormats.dll
+C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\NPOI.xml
+C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.csprojResolveAssemblyReference.cache
+C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.exe
+C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.pdb
