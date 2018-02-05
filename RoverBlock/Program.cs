@@ -49,6 +49,8 @@ namespace RoverBlock
                 dh.runLotteryB(b, students);
             }
 
+            Console.WriteLine(String.Join(", ", blocks.Select(x => x.Name)) + "\n");
+
 
 
             foreach (Student s in students)

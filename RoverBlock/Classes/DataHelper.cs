@@ -31,7 +31,7 @@ namespace RoverBlock.Classes
                 join lsB in lockedStudents
                     on new { a = ls.NetworkID, b = "B" } equals new { a = lsB.NetworkID, b = lsB.Day } into joinedB
                 from lsB in joinedB.DefaultIfEmpty()
-                select new Student(ls.NetworkID, lsB == null ? null : reservedBlock, lsA == null ? null : reservedBlock)
+                select new Student(ls.NetworkID, lsA == null ? null : reservedBlock, lsB == null ? null : reservedBlock)
             ).GroupBy(x => x.NetworkID).Select(x => x.FirstOrDefault()).ToList();
 
             return output;
