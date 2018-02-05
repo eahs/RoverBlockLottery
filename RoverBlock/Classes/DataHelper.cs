@@ -147,13 +147,13 @@ namespace RoverBlock.Classes
         {
             List<Dictionary<String, String>> output = new List<Dictionary<String, String>>();
 
-            HSSFWorkbook hssfwb;
+            HSSFWorkbook workbook;
             using (FileStream file = new FileStream("../../Sheets/" + fileName, FileMode.Open, FileAccess.Read))
             {
-                hssfwb = new HSSFWorkbook(file);
+                workbook = new HSSFWorkbook(file);
             }
 
-            ISheet sheet = hssfwb.GetSheetAt(0);
+            ISheet sheet = workbook.GetSheetAt(0);
             for (int row = 1; row <= sheet.LastRowNum; row++)
             {
                 if (sheet.GetRow(row) != null)
@@ -171,6 +171,33 @@ namespace RoverBlock.Classes
             }
 
             return output;
+        }
+
+        public void writeStudentsSheet(List<Student> students)
+        {
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            ISheet sheet = workbook.CreateSheet("Sheet1");
+
+            IRow header = sheet.CreateRow(0);
+            header.CreateCell(0).SetCellValue("Network ID");
+            header.CreateCell(1).SetCellValue("A Day Class");
+            header.CreateCell(2).SetCellValue("B Day Class");
+            for (int i = 0; i < students.Count; i++)
+            {
+                Student student = students[i];
+                IRow row = sheet.CreateRow(i + 1);
+                row.CreateCell(0).SetCellValue(student.NetworkID);
+                row.CreateCell(1).SetCellValue(student.A == null ? "" : student.A.Name);
+                row.CreateCell(2).SetCellValue(student.B == null ? "" : student.B.Name);
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                sheet.AutoSizeColumn(i);
+            }
+            using (var file = File.Create("../../Sheets/Output.xls"))
+            {
+                workbook.Write(file);
+            }
         }
 
 

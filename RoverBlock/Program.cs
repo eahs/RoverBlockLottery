@@ -60,6 +60,12 @@ namespace RoverBlock
                 Console.WriteLine();
             }
 
+
+
+            dh.writeStudentsSheet(students);
+
+
+
             Console.ReadLine();
         }
     }
