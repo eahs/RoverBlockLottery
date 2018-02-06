@@ -10,7 +10,7 @@ namespace RoverBlock.Classes
     {
         private static SheetHelper sh = new SheetHelper();
 
-        public void countChoices(Dictionary<String, int> map, int grade)
+        public void countChoices(Dictionary<String, int> map, int grade, List<Student> students)
         {
             String fileName = "Choices" + grade + ".xls";
             List<Dictionary<String, int>> choiceCounts = new List<Dictionary<string, int>>()
@@ -24,13 +24,21 @@ namespace RoverBlock.Classes
             List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
             foreach (Dictionary<String, String> entry in sheetData)
             {
-                List<String> choices = new List<string>()
+                String NetworkID = entry["Email"].ToLower().Replace("@roverkids.org", "");
+                Student s = students.Where(x => x.NetworkID == NetworkID).FirstOrDefault();
+
+                if (s == null)
                 {
-                    entry["Choice1"],
-                    entry["Choice2"],
-                    entry["Choice3"],
-                    entry["Choice4"]
-                }.Distinct().ToList();
+                    continue;
+                }
+
+                // don't count a student's choices if they are locked into two classes already
+                if(s.A != null && s.B != null)
+                {
+                    continue;
+                }
+
+                List<String> choices = s.Choices;
 
                 for (int i = 0; i < choices.Count; i++)
                 {

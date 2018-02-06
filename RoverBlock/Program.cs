@@ -26,18 +26,6 @@ namespace RoverBlock
 
             for (int i = 9; i < 12; i++)
             {
-                // compute interest in specific rover blocks for grades 9 through 11
-                Dictionary<String, int> choicesMap = new Dictionary<String, int>()
-                {
-                    { "Choice1", 4 },
-                    { "Choice2", 5 },
-                    { "Choice3", 6 },
-                    { "Choice4", 7 },
-                };
-                rh.countChoices(choicesMap, i);
-
-
-
                 // load students from master directed study lists
                 Dictionary<String, int> studentsMap = new Dictionary<string, int>()
                 {
@@ -70,6 +58,19 @@ namespace RoverBlock
                     { "Choice4", 7 }
                 };
                 dh.loadStudentChoices(studentChoiceMap, i, students, blocks);
+
+
+
+                // compute interest in specific rover blocks for grades 9 through 11
+                Dictionary<String, int> choicesMap = new Dictionary<String, int>()
+                {
+                    { "Email", 8},
+                    { "Choice1", 4 },
+                    { "Choice2", 5 },
+                    { "Choice3", 6 },
+                    { "Choice4", 7 },
+                };
+                rh.countChoices(choicesMap, i, students);
 
 
 
