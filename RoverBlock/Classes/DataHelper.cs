@@ -32,7 +32,7 @@ namespace RoverBlock.Classes
             return students;
         }
 
-        public void loadStudentChoices(Dictionary<String, int> map, int grade, List<Student> students)
+        public void loadStudentChoices(Dictionary<String, int> map, int grade, List<Student> students, List<Block> blocks)
         {
             String fileName = "Choices" + grade + ".xls";
             List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
@@ -54,6 +54,25 @@ namespace RoverBlock.Classes
                 if(s == null)
                 {
                     continue;
+                }
+
+                for(int i = 0; i < choices.Count; i++)
+                {
+                    String choice = choices[i];
+                    
+                    // try to match Name to ID
+                    String RoverBlockID = blocks.Where(x => x.Name.ToLower() == choice.ToLower()).Select(x => x.ID).FirstOrDefault();
+
+                    if(RoverBlockID == null)
+                    {
+                        RoverBlockID = choice;
+                    }
+                    else
+                    {
+                        RoverBlockID = "";
+                    }
+
+                    choices[i] = RoverBlockID;
                 }
 
                 s.Choices = choices;
@@ -80,11 +99,11 @@ namespace RoverBlock.Classes
 
                     if (Day == "A")
                     {
-                        s.A = new Block(BlockID, 0, 0); ;
+                        s.A = new Block(BlockID, "", 0, 0); ;
                     }
                     else if (Day == "B")
                     {
-                        s.B = new Block(BlockID, 0, 0); ;
+                        s.B = new Block(BlockID, "", 0, 0); ;
                     }
                 }
             }
@@ -97,11 +116,13 @@ namespace RoverBlock.Classes
             List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
             foreach (Dictionary<String, String> entry in sheetData)
             {
-                String BlockName = entry["Class Name"];
-                int aSlots = tryParse(entry["A Slots"]);
-                int bSlots = tryParse(entry["B Slots"]);
+                String BlockID = entry["Block ID"];
+                String BlockName = entry["Block Name"];
 
-                blocks.Add(new Block(BlockName, aSlots, bSlots));
+                // int aSlots = tryParse(entry["A Slots"]);
+                // int bSlots = tryParse(entry["B Slots"]);
+
+                blocks.Add(new Block(BlockID, BlockName, 0, 0));
             }
 
             shuffle(blocks);

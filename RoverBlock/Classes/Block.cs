@@ -8,12 +8,14 @@ namespace RoverBlock
 {
     class Block
     {
+        public String ID;
         public String Name;
         public int aSlots;
         public int bSlots;
 
-        public Block(String Name, int aSlots, int bSlots)
+        public Block(String ID, String Name, int aSlots, int bSlots)
         {
+            this.ID = ID;
             this.Name = Name;
             this.aSlots = aSlots;
             this.bSlots = bSlots;

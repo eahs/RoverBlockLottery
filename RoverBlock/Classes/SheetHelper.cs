@@ -20,11 +20,17 @@ namespace RoverBlock.Classes
             }
 
             ISheet sheet = workbook.GetSheetAt(0);
-            for (int row = 1; row < sheet.LastRowNum; row++)
+            for (int row = 1; row <= sheet.LastRowNum; row++)
             {
                 if (sheet.GetRow(row) != null)
                 {
                     List<ICell> cells = sheet.GetRow(row).Cells;
+
+                    if(cells.Count == 0)
+                    {
+                        break;
+                    }
+
                     Dictionary<String, String> dict = new Dictionary<String, String>();
 
                     foreach (KeyValuePair<String, int> entry in map)

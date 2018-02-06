@@ -15,6 +15,15 @@ namespace RoverBlock
 
 
 
+            Dictionary<String, int> blocksMap = new Dictionary<string, int>()
+            {
+                { "Block ID", 0 },
+                { "Block Name", 1 }
+            };
+            List<Block> blocks = dh.getBlocks("Blocks.xls", blocksMap);
+
+
+
             for (int i = 9; i < 12; i++)
             {
                 // compute interest in specific rover blocks for grades 9 through 11
@@ -60,7 +69,7 @@ namespace RoverBlock
                     { "Choice3", 6 },
                     { "Choice4", 7 }
                 };
-                dh.loadStudentChoices(studentChoiceMap, i, students);
+                dh.loadStudentChoices(studentChoiceMap, i, students, blocks);
 
 
 
@@ -72,20 +81,12 @@ namespace RoverBlock
 
             /*
             
-            Dictionary<String, int> blocksMap = new Dictionary<string, int>()
-            {
-                { "Class Name", 0 },
-                { "A Slots", 1 },
-                { "B Slots", 2 }
-            };
-            List<Block> blocks = dh.getBlocks("Classes.xls", blocksMap);
-
             foreach(Block b in blocks)
             {
                 dh.runLotteryA(b, students);
                 dh.runLotteryB(b, students);
             }
-            
+
             */
         }
     }
