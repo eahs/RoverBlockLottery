@@ -10,60 +10,21 @@ namespace RoverBlock.Classes
     class DataHelper
     {
         private static Random rnd = new Random();
+        private static SheetHelper sh = new SheetHelper();
 
-        public List<Student> getLockedStudents(String fileName, Dictionary<String, int> map)
+        public List<Student> getStudents(Dictionary<String, int> map, int grade)
         {
-            List<LockedStudent> lockedStudents = new List<LockedStudent>();
-
-            List<Dictionary<String, String>> sheetData = readSheet(fileName, map);
-            foreach (Dictionary<String, String> entry in sheetData)
-            {
-                lockedStudents.Add(new LockedStudent(entry["NetworkID"], entry["Day"]));
-            }
-
-            Block reservedBlock = new Block("RESERVED", 0, 0);
-
-            List<Student> output = (
-                from ls in lockedStudents
-                join lsA in lockedStudents
-                    on new { a = ls.NetworkID, b = "A" } equals new { a = lsA.NetworkID, b = lsA.Day } into joinedA
-                from lsA in joinedA.DefaultIfEmpty()
-                join lsB in lockedStudents
-                    on new { a = ls.NetworkID, b = "B" } equals new { a = lsB.NetworkID, b = lsB.Day } into joinedB
-                from lsB in joinedB.DefaultIfEmpty()
-                select new Student(ls.NetworkID, lsA == null ? null : reservedBlock, lsB == null ? null : reservedBlock)
-            ).GroupBy(x => x.NetworkID).Select(x => x.FirstOrDefault()).ToList();
-
-            return output;
-        }
-
-        public List<Student> getStudents(String fileName, Dictionary<String, int> map, List<Student> lockedStudents)
-        {
+            String fileName = "Students" + grade + ".xls";
             List<Student> students = new List<Student>();
 
-            List<Dictionary<String, String>> sheetData = readSheet(fileName, map);
+            List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
             foreach (Dictionary<String, String> entry in sheetData)
             {
-                String NetworkID = entry["NetworkID"];
-                List<String> choices = new List<String>()
-                {
-                    entry["Choice 1"],
-                    entry["Choice 2"],
-                    entry["Choice 3"]
-                }.Distinct().ToList();
+                String NetworkID = entry["NetworkID"].ToLower();
+                String LastName = entry["LastName"];
+                String FirstName = entry["FirstName"];
 
-                // TODO: use an intersect here. that would solve the duplicate issue and "promote" choices if the class does not exist
-
-                // reuse Student object from locked students to preserve RESERVED classes
-                Student s = lockedStudents.Where(x => x.NetworkID == NetworkID).SingleOrDefault();
-
-                // if no student matched, create a new one
-                if (s == null)
-                {
-                    s = new Student(NetworkID, null, null);
-                }
-
-                s.Choices = choices;
+                Student s = new Student(NetworkID, FirstName, LastName);
 
                 students.Add(s);
             }
@@ -71,11 +32,69 @@ namespace RoverBlock.Classes
             return students;
         }
 
+        public void loadStudentChoices(Dictionary<String, int> map, int grade, List<Student> students)
+        {
+            String fileName = "Choices" + grade + ".xls";
+            List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
+            foreach (Dictionary<String, String> entry in sheetData)
+            {
+                String NetworkID = entry["NetworkID"].ToLower().Replace("@roverkids.org", "");
+
+                // TODO: use an intersect here. that would solve the duplicate issue and "promote" choices if the class does not exist
+                List<String> choices = new List<String>()
+                {
+                    entry["Choice1"],
+                    entry["Choice2"],
+                    entry["Choice3"],
+                    entry["Choice4"]
+                }.Distinct().ToList();
+
+                Student s = students.Where(x => x.NetworkID == NetworkID).FirstOrDefault();
+
+                if(s == null)
+                {
+                    continue;
+                }
+
+                s.Choices = choices;
+            }
+        }
+
+        public void lockStudents(String fileName, Dictionary<String, int> map, List<Student> students)
+        {
+            List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
+            foreach (Dictionary<String, String> entry in sheetData)
+            {
+                String NetworkID = entry["NetworkID"].ToLower();
+                String BlockID = entry["BlockID"];
+                String Day = entry["Day"];
+
+                if (NetworkID != "")
+                {
+                    Student s = students.Where(x => x.NetworkID == NetworkID).FirstOrDefault();
+
+                    if (s == null)
+                    {
+                        continue;
+                    }
+
+                    if (Day == "A")
+                    {
+                        s.A = new Block(BlockID, 0, 0); ;
+                    }
+                    else if (Day == "B")
+                    {
+                        s.B = new Block(BlockID, 0, 0); ;
+                    }
+                }
+            }
+        }
+
         public List<Block> getBlocks(String fileName, Dictionary<String, int> map)
         {
             List<Block> blocks = new List<Block>();
 
-            List<Dictionary<String, String>> sheetData = readSheet(fileName, map);
+            List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
             foreach (Dictionary<String, String> entry in sheetData)
             {
                 String BlockName = entry["Class Name"];
@@ -96,7 +115,7 @@ namespace RoverBlock.Classes
 
             foreach (Student s in interestedStudents)
             {
-                pool.AddRange(Enumerable.Repeat(s, 4 - s.Choices.IndexOf(b.Name)));
+                pool.AddRange(Enumerable.Repeat(s, 3 - s.Choices.IndexOf(b.Name)));
             }
 
             interestedStudents = null;
@@ -142,64 +161,6 @@ namespace RoverBlock.Classes
                 pool.RemoveAll(x => x.NetworkID == winner.NetworkID);
             }
         }
-
-        public List<Dictionary<String, String>> readSheet(String fileName, Dictionary<String, int> map)
-        {
-            List<Dictionary<String, String>> output = new List<Dictionary<String, String>>();
-
-            HSSFWorkbook workbook;
-            using (FileStream file = new FileStream("../../Sheets/" + fileName, FileMode.Open, FileAccess.Read))
-            {
-                workbook = new HSSFWorkbook(file);
-            }
-
-            ISheet sheet = workbook.GetSheetAt(0);
-            for (int row = 1; row <= sheet.LastRowNum; row++)
-            {
-                if (sheet.GetRow(row) != null)
-                {
-                    List<ICell> cells = sheet.GetRow(row).Cells;
-                    Dictionary<String, String> dict = new Dictionary<String, String>();
-
-                    foreach (KeyValuePair<String, int> entry in map)
-                    {
-                        dict.Add(entry.Key, cells[entry.Value].ToString());
-                    }
-
-                    output.Add(dict);
-                }
-            }
-
-            return output;
-        }
-
-        public void writeStudentsSheet(List<Student> students)
-        {
-            HSSFWorkbook workbook = new HSSFWorkbook();
-            ISheet sheet = workbook.CreateSheet("Sheet1");
-
-            IRow header = sheet.CreateRow(0);
-            header.CreateCell(0).SetCellValue("Network ID");
-            header.CreateCell(1).SetCellValue("A Day Class");
-            header.CreateCell(2).SetCellValue("B Day Class");
-            for (int i = 0; i < students.Count; i++)
-            {
-                Student student = students[i];
-                IRow row = sheet.CreateRow(i + 1);
-                row.CreateCell(0).SetCellValue(student.NetworkID);
-                row.CreateCell(1).SetCellValue(student.A == null ? "" : student.A.Name);
-                row.CreateCell(2).SetCellValue(student.B == null ? "" : student.B.Name);
-            }
-            for (int i = 0; i < 3; i++)
-            {
-                sheet.AutoSizeColumn(i);
-            }
-            using (var file = File.Create("../../Sheets/Output.xls"))
-            {
-                workbook.Write(file);
-            }
-        }
-
 
         public int tryParse(String str)
         {

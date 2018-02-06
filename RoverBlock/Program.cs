@@ -10,31 +10,68 @@ namespace RoverBlock
         static void Main(string[] args)
         {
             DataHelper dh = new DataHelper();
+            SheetHelper sh = new SheetHelper();
+            ReconHelper rh = new ReconHelper();
 
-            Dictionary<String, int> lockedStudentsMap = new Dictionary<string, int>()
+
+
+            for (int i = 9; i < 12; i++)
             {
-                { "Day", 0 },
-                { "NetworkID", 1 }
-            };
-            List<Student> lockedStudents = dh.getLockedStudents("LockedStudents.xls", lockedStudentsMap);
+                // compute interest in specific rover blocks for grades 9 through 11
+                Dictionary<String, int> choicesMap = new Dictionary<String, int>()
+                {
+                    { "Choice1", 4 },
+                    { "Choice2", 5 },
+                    { "Choice3", 6 },
+                    { "Choice4", 7 },
+                };
+                rh.countChoices(choicesMap, i);
 
 
 
-            Dictionary<String, int> choicesMap = new Dictionary<string, int>()
-            {
-                { "NetworkID", 0 },
-                { "Choice 1", 1 },
-                { "Choice 2", 2 },
-                { "Choice 3", 3 }
-            };
-            List<Student> students = dh.getStudents("Choices.xls", choicesMap, lockedStudents);
-
-            // free up some memory here
-            lockedStudents = null;
-            GC.Collect();
+                // load students from master directed study list
+                Dictionary<String, int> studentsMap = new Dictionary<string, int>()
+                {
+                    { "NetworkID", 0 },
+                    { "LastName", 1 },
+                    { "FirstName", 2 }
+                };
+                List<Student> students = dh.getStudents(studentsMap, i);
 
 
 
+                // lock students into specific rover blocks
+                Dictionary<String, int> lockedStudentsMap = new Dictionary<String, int>()
+                {
+                    { "Day", 0 },
+                    { "BlockID", 1 },
+                    { "NetworkID", 5 }
+                };
+                dh.lockStudents("LockedStudents.xls", lockedStudentsMap, students);
+
+
+
+                // load the students' choices into a list and remove duplicates
+                Dictionary<String, int> studentChoiceMap = new Dictionary<String, int>()
+                {
+                    { "NetworkID", 8 },
+                    { "Choice1", 4 },
+                    { "Choice2", 5 },
+                    { "Choice3", 6 },
+                    { "Choice4", 7 }
+                };
+                dh.loadStudentChoices(studentChoiceMap, i, students);
+
+
+
+                // output to XLS file
+                sh.writeStudentsSheet(students, i);
+            }
+
+
+
+            /*
+            
             Dictionary<String, int> blocksMap = new Dictionary<string, int>()
             {
                 { "Class Name", 0 },
@@ -48,27 +85,8 @@ namespace RoverBlock
                 dh.runLotteryA(b, students);
                 dh.runLotteryB(b, students);
             }
-
-            Console.WriteLine(String.Join(", ", blocks.Select(x => x.Name)) + "\n");
-
-
-
-            foreach (Student s in students)
-            {
-                Console.WriteLine("ID: " + s.NetworkID);
-                Console.WriteLine("A: " + (s.A == null ? "null" : s.A.Name));
-                Console.WriteLine("B: " + (s.B == null ? "null" : s.B.Name));
-                Console.WriteLine(String.Join(", ", s.Choices));
-                Console.WriteLine();
-            }
-
-
-
-            dh.writeStudentsSheet(students);
-
-
-
-            Console.ReadLine();
+            
+            */
         }
     }
 }

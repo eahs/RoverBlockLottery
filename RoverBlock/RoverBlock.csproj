@@ -60,7 +60,8 @@
   <ItemGroup>
     <Compile Include="Classes\Block.cs" />
     <Compile Include="Classes\DataHelper.cs" />
-    <Compile Include="Classes\LockedStudent.cs" />
+    <Compile Include="Classes\SheetHelper.cs" />
+    <Compile Include="Classes\ReconHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Classes\Student.cs" />

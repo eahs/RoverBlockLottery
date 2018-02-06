@@ -10,6 +10,8 @@ namespace RoverBlock
     {
         // id is the network id of the student. (eg. greenec)
         public String NetworkID;
+        public String FirstName;
+        public String LastName;
 
         // the student's assigned classes
         public Block A;
@@ -18,11 +20,11 @@ namespace RoverBlock
         // the student's class choices
         public List<String> Choices;
 
-        public Student(String NetworkID, Block A, Block B)
+        public Student(String NetworkID, String FirstName, String LastName)
         {
             this.NetworkID = NetworkID;
-            this.A = A;
-            this.B = B;
+            this.FirstName = FirstName;
+            this.LastName = LastName;
         }
     }
 }
