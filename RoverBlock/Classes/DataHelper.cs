@@ -51,25 +51,21 @@ namespace RoverBlock.Classes
 
                 Student s = students.Where(x => x.NetworkID == NetworkID).FirstOrDefault();
 
-                if(s == null)
+                if (s == null)
                 {
                     continue;
                 }
 
-                for(int i = 0; i < choices.Count; i++)
+                for (int i = 0; i < choices.Count; i++)
                 {
                     String choice = choices[i];
-                    
+
                     // try to match Name to ID
                     String RoverBlockID = blocks.Where(x => x.Name.ToLower() == choice.ToLower()).Select(x => x.ID).FirstOrDefault();
 
-                    if(RoverBlockID == null)
+                    if (RoverBlockID == null)
                     {
                         RoverBlockID = choice;
-                    }
-                    else
-                    {
-                        RoverBlockID = "";
                     }
 
                     choices[i] = RoverBlockID;

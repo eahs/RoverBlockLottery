@@ -22,3 +22,16 @@ C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\NPOI.xml
 C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.csprojResolveAssemblyReference.cache
 C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.exe
 C:\Users\Connor\Documents\GitHub\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.pdb
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\RoverBlock.exe.config
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\RoverBlock.exe
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\RoverBlock.pdb
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\ICSharpCode.SharpZipLib.dll
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\NPOI.dll
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\NPOI.OOXML.dll
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\NPOI.OpenXml4Net.dll
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\NPOI.OpenXmlFormats.dll
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\bin\Debug\NPOI.xml
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.csprojResolveAssemblyReference.cache
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.csproj.CoreCompileInputs.cache
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.exe
+C:\Users\eahscs\Documents\GitHub\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.pdb

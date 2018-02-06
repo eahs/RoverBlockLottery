@@ -60,8 +60,8 @@ namespace RoverBlock.Classes
                 Student student = students[i];
                 IRow row = sheet.CreateRow(i + 1);
                 row.CreateCell(0).SetCellValue(student.NetworkID);
-                row.CreateCell(1).SetCellValue(student.A == null ? "" : student.A.Name);
-                row.CreateCell(2).SetCellValue(student.B == null ? "" : student.B.Name);
+                row.CreateCell(1).SetCellValue(student.A == null ? "" : student.A.ID);
+                row.CreateCell(2).SetCellValue(student.B == null ? "" : student.B.ID);
                 row.CreateCell(3).SetCellValue(student.Choices == null ? "" : String.Join(", ", student.Choices));
             }
             for (int i = 0; i < 4; i++)
@@ -76,12 +76,7 @@ namespace RoverBlock.Classes
 
         public void writeChoicesSheet(List<Dictionary<String, int>> choiceCounts, int grade)
         {
-            List<String> classes = new List<String>();
-            foreach (Dictionary<String, int> dict in choiceCounts)
-            {
-                classes.AddRange(dict.Keys);
-            }
-            classes = classes.Distinct().ToList();
+            List<String> classes = choiceCounts.SelectMany(x => x.Keys).Distinct().ToList();
 
             HSSFWorkbook workbook = new HSSFWorkbook();
             ISheet sheet = workbook.CreateSheet("Sheet1");

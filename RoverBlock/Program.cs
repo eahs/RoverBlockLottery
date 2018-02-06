@@ -38,7 +38,7 @@ namespace RoverBlock
 
 
 
-                // load students from master directed study list
+                // load students from master directed study lists
                 Dictionary<String, int> studentsMap = new Dictionary<string, int>()
                 {
                     { "NetworkID", 0 },
