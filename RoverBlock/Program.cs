@@ -1,6 +1,7 @@
 ﻿using RoverBlock.Classes;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace RoverBlock
@@ -13,6 +14,8 @@ namespace RoverBlock
             SheetHelper sh = new SheetHelper();
             ReconHelper rh = new ReconHelper();
 
+            String output = "";
+
 
 
             for (int i = 9; i < 12; i++)
@@ -21,7 +24,7 @@ namespace RoverBlock
                 List<Student> bestStudents = new List<Student>();
                 List<Block> bestBlocks = new List<Block>();
 
-                for (int j = 0; j < 1000; j++) {
+                for (int j = 0; j < 500; j++) {
 
                     Dictionary<String, int> blocksMap = new Dictionary<string, int>()
                     {
@@ -82,6 +85,19 @@ namespace RoverBlock
 
 
 
+                    // generate a list of students that did not fill out the google form
+                    rh.noChoiceStudents(students, i);
+
+
+
+                    // run lotteries in ascending order of popularity
+                    // blocks = blocks.OrderBy(x => students.Where(y => y.Choices != null && (y.A == null || y.B == null) && y.Choices.Contains(x.Name)).Count()).ToList();
+
+                    // Console.WriteLine("Grade " + i + " lotteries, running from least to most popular: ");
+                    // Console.WriteLine(String.Join(", ", blocks.Select(x => x.Name)) + "\n");
+
+
+
                     foreach (Block b in blocks)
                     {
                         if (b.aSlots != 0 && b.bSlots != 0 && students.Where(x => x.Choices != null && x.Choices.Contains(b.Name)).Count() == 0)
@@ -98,7 +114,7 @@ namespace RoverBlock
 
 
 
-                    int newScore = students.Where(x => x.Choices != null && x.A == null).Count() + students.Where(x => x.B == null).Count();
+                    int newScore = students.Where(x => x.Choices != null && x.A == null).Count() + students.Where(x => x.Choices != null && x.B == null).Count();
 
                     if(newScore < score)
                     {
@@ -117,13 +133,18 @@ namespace RoverBlock
 
                     if(sumSlots != 0)
                     {
-                        Console.WriteLine(sumSlots + " slots open in " + b.Name);
+                        output += sumSlots + " slots open in " + b.Name + "\n";
                     }
                 }
 
-                Console.WriteLine("Grade " + i + " score: " + score + " (lower is better)\n");
+                output += "A unscheduled: " + bestStudents.Where(x => x.Choices != null && x.A == null).Count() + "\n";
+                output += "B unscheduled: " + bestStudents.Where(x => x.Choices != null && x.B == null).Count() + "\n";
+                output += "Grade " + i + " score: " + score + " (lower is better)\n\n";
             }
-            
+
+            File.WriteAllLines("../../Sheets/Output/ConsoleOutput.txt", output.Split('\n'));
+
+            Console.WriteLine(output);
             Console.ReadLine();
         }
     }

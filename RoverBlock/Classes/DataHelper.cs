@@ -102,7 +102,7 @@ namespace RoverBlock.Classes
             foreach (Dictionary<String, String> entry in sheetData)
             {
                 String BlockID = entry["Block ID"];
-                String BlockName = entry["Block Name"];
+                String BlockName = entry["Block Name"].Trim();
 
                 int aSlots = tryParse(entry["A Slots"]);
                 int bSlots = tryParse(entry["B Slots"]);
@@ -177,7 +177,7 @@ namespace RoverBlock.Classes
             return int.TryParse(str, out int result) ? result : 0;
         }
 
-        public static void shuffle<T>(List<T> list)
+        public void shuffle<T>(List<T> list)
         {
             int n = list.Count;
             while (n > 1)

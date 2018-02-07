@@ -56,5 +56,26 @@ namespace RoverBlock.Classes
 
             sh.writeChoicesSheet(choiceCounts, grade);
         }
+
+        public void noChoiceStudents(List<Student> students, int grade)
+        {
+            List<Student> noChoices = new List<Student>();
+
+            foreach (Student s in students)
+            {
+                // don't count a student's choices if they are locked into two classes already
+                if (s.A != null && s.B != null)
+                {
+                    continue;
+                }
+
+                if(s.Choices == null)
+                {
+                    noChoices.Add(s);
+                }
+            }
+
+            sh.writeNoChoicesSheet(noChoices, grade);
+        }
     }
 }

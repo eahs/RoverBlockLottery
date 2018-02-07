@@ -109,5 +109,32 @@ namespace RoverBlock.Classes
                 workbook.Write(file);
             }
         }
+
+        public void writeNoChoicesSheet(List<Student> noChoices, int grade)
+        {
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            ISheet sheet = workbook.CreateSheet("Sheet1");
+
+            IRow header = sheet.CreateRow(0);
+            header.CreateCell(0).SetCellValue("Network ID");
+            header.CreateCell(1).SetCellValue("First Name");
+            header.CreateCell(2).SetCellValue("Last Name");
+
+            for (int i = 0; i < noChoices.Count; i++)
+            {
+                IRow row = sheet.CreateRow(i + 1);
+                row.CreateCell(0).SetCellValue(noChoices[i].NetworkID);
+                row.CreateCell(1).SetCellValue(noChoices[i].FirstName);
+                row.CreateCell(2).SetCellValue(noChoices[i].LastName);
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                sheet.AutoSizeColumn(i);
+            }
+            using (var file = File.Create("../../Sheets/Output/NoChoices" + grade + ".xls"))
+            {
+                workbook.Write(file);
+            }
+        }
     }
 }
