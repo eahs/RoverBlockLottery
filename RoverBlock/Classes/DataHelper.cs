@@ -34,41 +34,26 @@ namespace RoverBlock.Classes
 
         public void loadStudentChoices(Dictionary<String, int> map, int grade, List<Student> students, List<Block> blocks)
         {
+            List<String> blockIntersect = blocks.Where(x => x.aSlots != 0 || x.bSlots != 0).Select(x => x.Name).ToList();
             String fileName = "Choices" + grade + ".xls";
             List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
             foreach (Dictionary<String, String> entry in sheetData)
             {
                 String NetworkID = entry["NetworkID"].ToLower().Replace("@roverkids.org", "");
 
-                // TODO: use an intersect here. that would solve the duplicate issue and "promote" choices if the class does not exist
                 List<String> choices = new List<String>()
                 {
                     entry["Choice1"],
                     entry["Choice2"],
                     entry["Choice3"],
                     entry["Choice4"]
-                }.Distinct().ToList();
+                }.Intersect(blockIntersect).ToList();
 
                 Student s = students.Where(x => x.NetworkID == NetworkID).FirstOrDefault();
 
                 if (s == null)
                 {
                     continue;
-                }
-
-                for (int i = 0; i < choices.Count; i++)
-                {
-                    String choice = choices[i];
-
-                    // try to match Name to ID
-                    String RoverBlockID = blocks.Where(x => x.Name.ToLower() == choice.ToLower()).Select(x => x.ID).FirstOrDefault();
-
-                    if (RoverBlockID == null)
-                    {
-                        RoverBlockID = choice;
-                    }
-
-                    choices[i] = RoverBlockID;
                 }
 
                 s.Choices = choices;
@@ -84,6 +69,9 @@ namespace RoverBlock.Classes
                 String BlockID = entry["BlockID"];
                 String Day = entry["Day"];
 
+                // TODO: remove this when BlockIDs are in the sheet
+                BlockID = "RESERVED";
+
                 if (NetworkID != "")
                 {
                     Student s = students.Where(x => x.NetworkID == NetworkID).FirstOrDefault();
@@ -95,18 +83,19 @@ namespace RoverBlock.Classes
 
                     if (Day == "A")
                     {
-                        s.A = new Block(BlockID, "", 0, 0); ;
+                        s.A = new Block(BlockID, "RESERVED", 0, 0); ;
                     }
                     else if (Day == "B")
                     {
-                        s.B = new Block(BlockID, "", 0, 0); ;
+                        s.B = new Block(BlockID, "RESERVED", 0, 0); ;
                     }
                 }
             }
         }
 
-        public List<Block> getBlocks(String fileName, Dictionary<String, int> map)
+        public List<Block> getBlocks(Dictionary<String, int> map, int grade)
         {
+            String fileName = "Blocks" + grade + ".xls";
             List<Block> blocks = new List<Block>();
 
             List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
@@ -115,10 +104,10 @@ namespace RoverBlock.Classes
                 String BlockID = entry["Block ID"];
                 String BlockName = entry["Block Name"];
 
-                // int aSlots = tryParse(entry["A Slots"]);
-                // int bSlots = tryParse(entry["B Slots"]);
+                int aSlots = tryParse(entry["A Slots"]);
+                int bSlots = tryParse(entry["B Slots"]);
 
-                blocks.Add(new Block(BlockID, BlockName, 0, 0));
+                blocks.Add(new Block(BlockID, BlockName, aSlots, bSlots));
             }
 
             shuffle(blocks);
@@ -127,34 +116,7 @@ namespace RoverBlock.Classes
 
         public void runLotteryA(Block b, List<Student> students)
         {
-            List<Student> interestedStudents = students.Where(x => x.A == null && x.Choices.Contains(b.Name)).ToList();
-            List<Student> pool = new List<Student>();
-
-            foreach (Student s in interestedStudents)
-            {
-                pool.AddRange(Enumerable.Repeat(s, 3 - s.Choices.IndexOf(b.Name)));
-            }
-
-            interestedStudents = null;
-            GC.Collect();
-
-            for (int i = 0; i < b.aSlots; i++)
-            {
-                if (pool.Count == 0)
-                {
-                    break;
-                }
-
-                Student winner = pool[rnd.Next(pool.Count)];
-                winner.Choices.Remove(b.Name);
-                winner.A = b;
-                pool.RemoveAll(x => x.NetworkID == winner.NetworkID);
-            }
-        }
-
-        public void runLotteryB(Block b, List<Student> students)
-        {
-            List<Student> interestedStudents = students.Where(x => x.B == null && x.Choices.Contains(b.Name)).ToList();
+            List<Student> interestedStudents = students.Where(x => x.Choices != null && x.A == null && x.Choices.Contains(b.Name)).ToList();
             List<Student> pool = new List<Student>();
 
             foreach (Student s in interestedStudents)
@@ -165,7 +127,36 @@ namespace RoverBlock.Classes
             interestedStudents = null;
             GC.Collect();
 
-            for (int i = 0; i < b.bSlots; i++)
+            while (b.aSlots > 0)
+            {
+                if (pool.Count == 0)
+                {
+                    break;
+                }
+
+                Student winner = pool[rnd.Next(pool.Count)];
+                winner.Choices.Remove(b.Name);
+                winner.A = b;
+                pool.RemoveAll(x => x.NetworkID == winner.NetworkID);
+
+                b.aSlots--;
+            }
+        }
+
+        public void runLotteryB(Block b, List<Student> students)
+        {
+            List<Student> interestedStudents = students.Where(x => x.Choices != null && x.B == null && x.Choices.Contains(b.Name)).ToList();
+            List<Student> pool = new List<Student>();
+
+            foreach (Student s in interestedStudents)
+            {
+                pool.AddRange(Enumerable.Repeat(s, 4 - s.Choices.IndexOf(b.Name)));
+            }
+
+            interestedStudents = null;
+            GC.Collect();
+
+            while (b.bSlots > 0)
             {
                 if (pool.Count == 0)
                 {
@@ -176,6 +167,8 @@ namespace RoverBlock.Classes
                 winner.Choices.Remove(b.Name);
                 winner.B = b;
                 pool.RemoveAll(x => x.NetworkID == winner.NetworkID);
+
+                b.bSlots--;
             }
         }
 

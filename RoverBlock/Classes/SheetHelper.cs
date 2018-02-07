@@ -52,9 +52,10 @@ namespace RoverBlock.Classes
 
             IRow header = sheet.CreateRow(0);
             header.CreateCell(0).SetCellValue("Network ID");
-            header.CreateCell(1).SetCellValue("A Day Class");
-            header.CreateCell(2).SetCellValue("B Day Class");
-            header.CreateCell(3).SetCellValue("Choices");
+            header.CreateCell(1).SetCellValue("A Day Class ID");
+            header.CreateCell(2).SetCellValue("B Day Class ID");
+            header.CreateCell(3).SetCellValue("A Day Class Name");
+            header.CreateCell(4).SetCellValue("B Day Class Name");
             for (int i = 0; i < students.Count; i++)
             {
                 Student student = students[i];
@@ -62,9 +63,10 @@ namespace RoverBlock.Classes
                 row.CreateCell(0).SetCellValue(student.NetworkID);
                 row.CreateCell(1).SetCellValue(student.A == null ? "" : student.A.ID);
                 row.CreateCell(2).SetCellValue(student.B == null ? "" : student.B.ID);
-                row.CreateCell(3).SetCellValue(student.Choices == null ? "" : String.Join(", ", student.Choices));
+                row.CreateCell(3).SetCellValue(student.A == null ? "" : student.A.Name);
+                row.CreateCell(4).SetCellValue(student.B == null ? "" : student.B.Name);
             }
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 sheet.AutoSizeColumn(i);
             }
