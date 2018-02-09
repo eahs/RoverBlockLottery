@@ -10,6 +10,7 @@ namespace RoverBlock.Classes
     {
         private static SheetHelper sh = new SheetHelper();
 
+        // TODO: don't use Intersect when loading in choice data for interest, use distinct instead
         public void countChoices(Dictionary<String, int> map, int grade, List<Student> students)
         {
             String fileName = "Choices" + grade + ".xls";
@@ -24,7 +25,7 @@ namespace RoverBlock.Classes
             List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
             foreach (Dictionary<String, String> entry in sheetData)
             {
-                String NetworkID = entry["Email"].ToLower().Replace("@roverkids.org", "");
+                String NetworkID = entry["NetworkID"].ToLower().Replace("@roverkids.org", "");
                 Student s = students.Where(x => x.NetworkID == NetworkID).FirstOrDefault();
 
                 if (s == null)
@@ -76,6 +77,38 @@ namespace RoverBlock.Classes
             }
 
             sh.writeNoChoicesSheet(noChoices, grade);
+        }
+
+        public void wallOfShame(Dictionary<String, int> map, int grade)
+        {
+            List<Student> students = new List<Student>();
+
+            String fileName = "Choices" + grade + ".xls";
+            List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
+
+            foreach (Dictionary<String, String> entry in sheetData)
+            {
+                String NetworkID = entry["NetworkID"].ToLower().Replace("@roverkids.org", "");
+                String LastName = entry["LastName"];
+                String FirstName = entry["FirstName"];
+
+                List<String> choices = new List<String>()
+                {
+                    entry["Choice1"],
+                    entry["Choice2"],
+                    entry["Choice3"],
+                    entry["Choice4"]
+                };
+
+                if(choices.Distinct().Count() != 4)
+                {
+                    Student s = new Student(NetworkID, FirstName, LastName);
+                    s.Choices = choices.GroupBy(x => x).Where(g => g.Count() > 1).Select(y => y.Key).ToList();
+                    students.Add(s);
+                }
+            }
+
+            sh.writeWallOfShame(students, grade);
         }
     }
 }

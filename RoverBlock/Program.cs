@@ -16,74 +16,69 @@ namespace RoverBlock
 
             String output = "";
 
+            Dictionary<String, int> blocksMap = new Dictionary<string, int>()
+            {
+                { "Block ID", 0 },
+                { "Block Name", 1 },
+                { "A Slots", 2 },
+                { "B Slots", 3 }
+            };
 
+            Dictionary<String, int> studentsMap = new Dictionary<string, int>()
+            {
+                { "NetworkID", 0 },
+                { "LastName", 1 },
+                { "FirstName", 2 }
+            };
+
+            Dictionary<String, int> lockedStudentsMap = new Dictionary<String, int>()
+            {
+                { "Day", 4 },
+                { "BlockID", 1 },
+                { "NetworkID", 3 }
+            };
+
+            Dictionary<String, int> studentChoiceMap = new Dictionary<String, int>()
+            {
+                { "LastName", 1 },
+                { "FirstName", 2 },
+                { "NetworkID", 8 },
+                { "Choice1", 4 },
+                { "Choice2", 5 },
+                { "Choice3", 6 },
+                { "Choice4", 7 }
+            };
+
+            // TODO: random scheduling if they didn't get their choices
 
             for (int i = 9; i < 12; i++)
             {
+                Console.WriteLine("Grade " + i + " starting.");
+
                 int score = int.MaxValue;
                 List<Student> bestStudents = new List<Student>();
                 List<Block> bestBlocks = new List<Block>();
 
-                for (int j = 0; j < 500; j++) {
+                // wall of shame for students who picked the same choice more than once
+                rh.wallOfShame(studentChoiceMap, i);
 
-                    Dictionary<String, int> blocksMap = new Dictionary<string, int>()
-                    {
-                        { "Block ID", 0 },
-                        { "Block Name", 1 },
-                        { "A Slots", 2 },
-                        { "B Slots", 3 }
-                    };
+                // TODO: don't run these operations on each iteration
+                for (int j = 0; j < 1000; j++) {
+
+                    // load blocks from master block list
                     List<Block> blocks = dh.getBlocks(blocksMap, i);
 
-
-
                     // load students from master directed study lists
-                    Dictionary<String, int> studentsMap = new Dictionary<string, int>()
-                    {
-                        { "NetworkID", 0 },
-                        { "LastName", 1 },
-                        { "FirstName", 2 }
-                    };
                     List<Student> students = dh.getStudents(studentsMap, i);
 
-
-
                     // lock students into specific rover blocks
-                    Dictionary<String, int> lockedStudentsMap = new Dictionary<String, int>()
-                    {
-                        { "Day", 4 },
-                        { "BlockID", 1 },
-                        { "NetworkID", 3 }
-                    };
                     dh.lockStudents("LockedStudents.xls", lockedStudentsMap, students);
 
-
-
                     // load the students' choices into a list and remove duplicates
-                    Dictionary<String, int> studentChoiceMap = new Dictionary<String, int>()
-                    {
-                        { "NetworkID", 8 },
-                        { "Choice1", 4 },
-                        { "Choice2", 5 },
-                        { "Choice3", 6 },
-                        { "Choice4", 7 }
-                    };
                     dh.loadStudentChoices(studentChoiceMap, i, students, blocks);
 
-
-
                     // compute interest in specific rover blocks for grades 9 through 11
-                    Dictionary<String, int> choicesMap = new Dictionary<String, int>()
-                    {
-                        { "Email", 8},
-                        { "Choice1", 4 },
-                        { "Choice2", 5 },
-                        { "Choice3", 6 },
-                        { "Choice4", 7 },
-                    };
-                    rh.countChoices(choicesMap, i, students);
-
-
+                    rh.countChoices(studentChoiceMap, i, students);
 
                     // generate a list of students that did not fill out the google form
                     rh.noChoiceStudents(students, i);
@@ -123,6 +118,8 @@ namespace RoverBlock
                         score = newScore;
                     }
                 }
+
+                // dh.assignRemaining(bestStudents, bestBlocks);
 
                 // output to XLS file
                 sh.writeStudentsSheet(bestStudents, i);

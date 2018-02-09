@@ -45,6 +45,7 @@ namespace RoverBlock.Classes
             return output;
         }
 
+        // TODO: add teacher name and students first/last name to row
         public void writeStudentsSheet(List<Student> students, int grade)
         {
             HSSFWorkbook workbook = new HSSFWorkbook();
@@ -97,7 +98,10 @@ namespace RoverBlock.Classes
                 row.CreateCell(0).SetCellValue(className);
                 for (int j = 0; j < 4; j++)
                 {
-                    row.CreateCell(j + 1).SetCellValue(choiceCounts[j][className]);
+                    if(choiceCounts[j].ContainsKey(className))
+                    {
+                        row.CreateCell(j + 1).SetCellValue(choiceCounts[j][className]);
+                    }
                 }
             }
             for (int i = 0; i < 5; i++)
@@ -132,6 +136,35 @@ namespace RoverBlock.Classes
                 sheet.AutoSizeColumn(i);
             }
             using (var file = File.Create("../../Sheets/Output/NoChoices" + grade + ".xls"))
+            {
+                workbook.Write(file);
+            }
+        }
+
+        public void writeWallOfShame(List<Student> students, int grade)
+        {
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            ISheet sheet = workbook.CreateSheet("Sheet1");
+
+            IRow header = sheet.CreateRow(0);
+            header.CreateCell(0).SetCellValue("Network ID");
+            header.CreateCell(1).SetCellValue("First Name");
+            header.CreateCell(2).SetCellValue("Last Name");
+            header.CreateCell(3).SetCellValue("Choices");
+
+            for (int i = 0; i < students.Count; i++)
+            {
+                IRow row = sheet.CreateRow(i + 1);
+                row.CreateCell(0).SetCellValue(students[i].NetworkID);
+                row.CreateCell(1).SetCellValue(students[i].FirstName);
+                row.CreateCell(2).SetCellValue(students[i].LastName);
+                row.CreateCell(3).SetCellValue(String.Join(", ", students[i].Choices));
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                sheet.AutoSizeColumn(i);
+            }
+            using (var file = File.Create("../../Sheets/Output/WallOfShame" + grade + ".xls"))
             {
                 workbook.Write(file);
             }
