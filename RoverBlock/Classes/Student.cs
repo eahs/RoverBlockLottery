@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace RoverBlock
 {
+    [Serializable]
     class Student
     {
         // id is the network id of the student. (eg. greenec)

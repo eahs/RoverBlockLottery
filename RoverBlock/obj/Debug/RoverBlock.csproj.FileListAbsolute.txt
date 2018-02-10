@@ -60,3 +60,6 @@ C:\Users\Connor\Desktop\RoverBlockLottery\RoverBlock\bin\Debug\NPOI.xml
 C:\Users\Connor\Desktop\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.csprojResolveAssemblyReference.cache
 C:\Users\Connor\Desktop\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.exe
 C:\Users\Connor\Desktop\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.pdb
+F:\12th Grade\RoverBlockLottery\RoverBlock\bin\Debug\RoverBlock.exe.config
+F:\12th Grade\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.exe
+F:\12th Grade\RoverBlockLottery\RoverBlock\obj\Debug\RoverBlock.pdb

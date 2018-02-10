@@ -1,9 +1,8 @@
-﻿using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace RoverBlock.Classes
 {
@@ -124,7 +123,6 @@ namespace RoverBlock.Classes
             }
 
             interestedStudents = null;
-            GC.Collect();
 
             while (b.aSlots > 0)
             {
@@ -153,7 +151,6 @@ namespace RoverBlock.Classes
             }
 
             interestedStudents = null;
-            GC.Collect();
 
             while (b.bSlots > 0)
             {
@@ -225,6 +222,18 @@ namespace RoverBlock.Classes
                 T value = list[k];
                 list[k] = list[n];
                 list[n] = value;
+            }
+        }
+
+        public T DeepCopy<T>(T obj)
+        {
+            using (MemoryStream stream = new MemoryStream())
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(stream, obj);
+                stream.Position = 0;
+
+                return (T)formatter.Deserialize(stream);
             }
         }
     }

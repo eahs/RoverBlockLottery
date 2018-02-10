@@ -49,56 +49,40 @@ namespace RoverBlock
                 { "Choice4", 7 }
             };
 
-            // TODO: random scheduling if they didn't get their choices
-
             for (int i = 9; i < 12; i++)
             {
                 Console.WriteLine("Grade " + i + " starting.");
 
+                // initialize variables for scoring
                 int score = int.MaxValue;
                 List<Student> bestStudents = new List<Student>();
                 List<Block> bestBlocks = new List<Block>();
 
-                // wall of shame for students who picked the same choice more than once
+                // load in data from sheets
+                List<Block> baseBlocks = dh.getBlocks(blocksMap, i);
+                List<Student> baseStudents = dh.getStudents(studentsMap, i);
+                dh.lockStudents("LockedStudents.xls", lockedStudentsMap, baseStudents);
+                dh.loadStudentChoices(studentChoiceMap, i, baseStudents, baseBlocks);
+
+                // reconnaissance to make sense of certain data points
+                rh.countChoices(studentChoiceMap, i, baseStudents);
+                rh.noChoiceStudents(baseStudents, i);
                 rh.wallOfShame(studentChoiceMap, i);
 
-                // TODO: don't run these operations on each iteration
-                for (int j = 0; j < 1000; j++) {
+                for (int j = 0; j < 1000; j++)
+                {
+                    // deep copy of the above blocks and students
+                    List<Block> blocks = baseBlocks.ConvertAll(x => dh.DeepCopy(x));
+                    List<Student> students = baseStudents.ConvertAll(x => dh.DeepCopy(x));
 
-                    // load blocks from master block list
-                    List<Block> blocks = dh.getBlocks(blocksMap, i);
-
-                    // load students from master directed study lists
-                    List<Student> students = dh.getStudents(studentsMap, i);
-
-                    // lock students into specific rover blocks
-                    dh.lockStudents("LockedStudents.xls", lockedStudentsMap, students);
-
-                    // load the students' choices into a list and remove duplicates
-                    dh.loadStudentChoices(studentChoiceMap, i, students, blocks);
-
-                    // compute interest in specific rover blocks for grades 9 through 11
-                    rh.countChoices(studentChoiceMap, i, students);
-
-                    // generate a list of students that did not fill out the google form
-                    rh.noChoiceStudents(students, i);
-
-
-
-                    // run lotteries in ascending order of popularity
-                    // blocks = blocks.OrderBy(x => students.Where(y => y.Choices != null && (y.A == null || y.B == null) && y.Choices.Contains(x.Name)).Count()).ToList();
-
-                    // Console.WriteLine("Grade " + i + " lotteries, running from least to most popular: ");
-                    // Console.WriteLine(String.Join(", ", blocks.Select(x => x.Name)) + "\n");
-
-
+                    dh.shuffle(blocks);
 
                     foreach (Block b in blocks)
                     {
-                        if (b.aSlots != 0 && b.bSlots != 0 && students.Where(x => x.Choices != null && x.Choices.Contains(b.Name)).Count() == 0)
+                        /* if (b.aSlots != 0 && b.bSlots != 0 && students.Where(x => x.Choices != null && x.Choices.Contains(b.Name)).Count() == 0)
                         {
-                            // Console.WriteLine("No grade " + i + " student voted for " + b.Name);
-                        }
+                            onsole.WriteLine("No grade " + i + " student voted for " + b.Name);
+                        } */
 
                         dh.runLotteryA(b, students);
                         dh.runLotteryB(b, students);
@@ -111,10 +95,10 @@ namespace RoverBlock
 
                     int newScore = students.Where(x => x.Choices != null && x.A == null).Count() + students.Where(x => x.Choices != null && x.B == null).Count();
 
-                    if(newScore < score)
+                    if (newScore < score)
                     {
-                        bestStudents = students.ToList();
-                        bestBlocks = blocks.ToList();
+                        bestStudents = students.ConvertAll(x => dh.DeepCopy(x));
+                        bestBlocks = blocks.ConvertAll(x => dh.DeepCopy(x));
                         score = newScore;
                     }
                 }
@@ -128,7 +112,7 @@ namespace RoverBlock
                 {
                     int sumSlots = b.aSlots + b.bSlots;
 
-                    if(sumSlots != 0)
+                    if (sumSlots != 0)
                     {
                         output += sumSlots + " slots open in " + b.Name + "\n";
                     }
@@ -139,9 +123,15 @@ namespace RoverBlock
                 output += "Grade " + i + " score: " + score + " (lower is better)\n\n";
             }
 
+            Console.WriteLine();
+
+            output = output.Trim();
+
             File.WriteAllLines("../../Sheets/Output/ConsoleOutput.txt", output.Split('\n'));
 
             Console.WriteLine(output);
+
+            Console.Write("\nScheduling completed! Press Enter to continue: ");
             Console.ReadLine();
         }
     }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace RoverBlock
 {
+    [Serializable]
     class Block
     {
         public String ID;
