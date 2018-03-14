@@ -97,8 +97,10 @@ namespace RoverBlock
 
                 if(choices.Distinct().Count() != 4)
                 {
-                    Student s = new Student(NetworkID, FirstName, LastName);
-                    s.Choices = choices.GroupBy(x => x).Where(g => g.Count() > 1).Select(y => y.Key).ToList();
+                    Student s = new Student(NetworkID, FirstName, LastName)
+                    {
+                        Choices = choices.GroupBy(x => x).Where(g => g.Count() > 1).Select(y => y.Key).ToList()
+                    };
                     students.Add(s);
                 }
             }
