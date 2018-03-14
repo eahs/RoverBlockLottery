@@ -1,17 +1,16 @@
 ﻿using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace RoverBlock.Classes
+namespace RoverBlock
 {
-    class SheetHelper
+    public static class SheetHelper
     {
-        public List<Dictionary<String, String>> readSheet(String fileName, Dictionary<String, int> map)
+        public static List<Dictionary<string, string>> ReadSheet(string fileName, Dictionary<string, int> map)
         {
-            List<Dictionary<String, String>> output = new List<Dictionary<String, String>>();
+            List<Dictionary<string, string>> output = new List<Dictionary<string, string>>();
 
             HSSFWorkbook workbook;
             using (FileStream file = new FileStream("../../Sheets/" + fileName, FileMode.Open, FileAccess.Read))
@@ -31,9 +30,9 @@ namespace RoverBlock.Classes
                         break;
                     }
 
-                    Dictionary<String, String> dict = new Dictionary<String, String>();
+                    Dictionary<string, string> dict = new Dictionary<string, string>();
 
-                    foreach (KeyValuePair<String, int> entry in map)
+                    foreach (KeyValuePair<string, int> entry in map)
                     {
                         dict.Add(entry.Key, cells[entry.Value].ToString());
                     }
@@ -46,7 +45,7 @@ namespace RoverBlock.Classes
         }
 
         // TODO: add teacher name and students first/last name to row
-        public void writeStudentsSheet(List<Student> students, int grade)
+        public static void WriteStudentsSheet(List<Student> students, int grade)
         {
             HSSFWorkbook workbook = new HSSFWorkbook();
             ISheet sheet = workbook.CreateSheet("Sheet1");
@@ -77,9 +76,9 @@ namespace RoverBlock.Classes
             }
         }
 
-        public void writeChoicesSheet(List<Dictionary<String, int>> choiceCounts, int grade)
+        public static void WriteChoicesSheet(List<Dictionary<string, int>> choiceCounts, int grade)
         {
-            List<String> classes = choiceCounts.SelectMany(x => x.Keys).Distinct().ToList();
+            List<string> classes = choiceCounts.SelectMany(x => x.Keys).Distinct().ToList();
 
             HSSFWorkbook workbook = new HSSFWorkbook();
             ISheet sheet = workbook.CreateSheet("Sheet1");
@@ -93,7 +92,7 @@ namespace RoverBlock.Classes
 
             for (int i = 0; i < classes.Count; i++)
             {
-                String className = classes[i];
+                string className = classes[i];
                 IRow row = sheet.CreateRow(i + 1);
                 row.CreateCell(0).SetCellValue(className);
                 for (int j = 0; j < 4; j++)
@@ -114,7 +113,7 @@ namespace RoverBlock.Classes
             }
         }
 
-        public void writeNoChoicesSheet(List<Student> noChoices, int grade)
+        public static void WriteNoChoicesSheet(List<Student> noChoices, int grade)
         {
             HSSFWorkbook workbook = new HSSFWorkbook();
             ISheet sheet = workbook.CreateSheet("Sheet1");
@@ -141,7 +140,7 @@ namespace RoverBlock.Classes
             }
         }
 
-        public void writeWallOfShame(List<Student> students, int grade)
+        public static void WriteWallOfShame(List<Student> students, int grade)
         {
             HSSFWorkbook workbook = new HSSFWorkbook();
             ISheet sheet = workbook.CreateSheet("Sheet1");
@@ -158,7 +157,7 @@ namespace RoverBlock.Classes
                 row.CreateCell(0).SetCellValue(students[i].NetworkID);
                 row.CreateCell(1).SetCellValue(students[i].FirstName);
                 row.CreateCell(2).SetCellValue(students[i].LastName);
-                row.CreateCell(3).SetCellValue(String.Join(", ", students[i].Choices));
+                row.CreateCell(3).SetCellValue(string.Join(", ", students[i].Choices));
             }
             for (int i = 0; i < 4; i++)
             {

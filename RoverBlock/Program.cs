@@ -1,5 +1,4 @@
-﻿using RoverBlock.Classes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,13 +9,10 @@ namespace RoverBlock
     {
         static void Main(string[] args)
         {
-            DataHelper dh = new DataHelper();
-            SheetHelper sh = new SheetHelper();
-            ReconHelper rh = new ReconHelper();
+            Random rnd = new Random();
+            string output = "";
 
-            String output = "";
-
-            Dictionary<String, int> blocksMap = new Dictionary<string, int>()
+            Dictionary<string, int> blocksMap = new Dictionary<string, int>()
             {
                 { "Block ID", 0 },
                 { "Block Name", 1 },
@@ -24,21 +20,21 @@ namespace RoverBlock
                 { "B Slots", 3 }
             };
 
-            Dictionary<String, int> studentsMap = new Dictionary<string, int>()
+            Dictionary<string, int> studentsMap = new Dictionary<string, int>()
             {
                 { "NetworkID", 0 },
                 { "LastName", 1 },
                 { "FirstName", 2 }
             };
 
-            Dictionary<String, int> lockedStudentsMap = new Dictionary<String, int>()
+            Dictionary<string, int> lockedStudentsMap = new Dictionary<string, int>()
             {
                 { "Day", 4 },
                 { "BlockID", 1 },
                 { "NetworkID", 3 }
             };
 
-            Dictionary<String, int> studentChoiceMap = new Dictionary<String, int>()
+            Dictionary<string, int> studentChoiceMap = new Dictionary<string, int>()
             {
                 { "LastName", 1 },
                 { "FirstName", 2 },
@@ -59,23 +55,23 @@ namespace RoverBlock
                 List<Block> bestBlocks = new List<Block>();
 
                 // load in data from sheets
-                List<Block> baseBlocks = dh.getBlocks(blocksMap, i);
-                List<Student> baseStudents = dh.getStudents(studentsMap, i);
-                dh.lockStudents("LockedStudents.xls", lockedStudentsMap, baseStudents);
-                dh.loadStudentChoices(studentChoiceMap, i, baseStudents, baseBlocks);
+                List<Block> baseBlocks = DataHelper.GetBlocks(blocksMap, i, rnd);
+                List<Student> baseStudents = DataHelper.GetStudents(studentsMap, i);
+                DataHelper.LockStudents("LockedStudents.xls", lockedStudentsMap, baseStudents);
+                DataHelper.LoadStudentChoices(studentChoiceMap, i, baseStudents, baseBlocks);
 
                 // reconnaissance to make sense of certain data points
-                rh.countChoices(studentChoiceMap, i, baseStudents);
-                rh.noChoiceStudents(baseStudents, i);
-                rh.wallOfShame(studentChoiceMap, i);
+                ReconHelper.CountChoices(studentChoiceMap, i, baseStudents);
+                ReconHelper.NoChoiceStudents(baseStudents, i);
+                ReconHelper.WallOfShame(studentChoiceMap, i);
 
                 for (int j = 0; j < 1000; j++)
                 {
                     // deep copy of the above blocks and students
-                    List<Block> blocks = baseBlocks.ConvertAll(x => dh.DeepCopy(x));
-                    List<Student> students = baseStudents.ConvertAll(x => dh.DeepCopy(x));
+                    List<Block> blocks = baseBlocks.ConvertAll(x => DataHelper.DeepCopy(x));
+                    List<Student> students = baseStudents.ConvertAll(x => DataHelper.DeepCopy(x));
 
-                    dh.shuffle(blocks);
+                    DataHelper.Shuffle(blocks, rnd);
 
                     foreach (Block b in blocks)
                     {
@@ -84,8 +80,8 @@ namespace RoverBlock
                             onsole.WriteLine("No grade " + i + " student voted for " + b.Name);
                         } */
 
-                        dh.runLotteryA(b, students);
-                        dh.runLotteryB(b, students);
+                        DataHelper.RunLotteryA(b, students, rnd);
+                        DataHelper.RunLotteryB(b, students, rnd);
 
                         // remove class from all students who did not win the lottery to promte their other choices
                         students.Where(x => x.Choices != null).Select(x => { x.Choices.Remove(b.Name); return x; }).ToList();
@@ -97,8 +93,8 @@ namespace RoverBlock
 
                     if (newScore < score)
                     {
-                        bestStudents = students.ConvertAll(x => dh.DeepCopy(x));
-                        bestBlocks = blocks.ConvertAll(x => dh.DeepCopy(x));
+                        bestStudents = students.ConvertAll(x => DataHelper.DeepCopy(x));
+                        bestBlocks = blocks.ConvertAll(x => DataHelper.DeepCopy(x));
                         score = newScore;
                     }
                 }
@@ -106,7 +102,7 @@ namespace RoverBlock
                 // dh.assignRemaining(bestStudents, bestBlocks);
 
                 // output to XLS file
-                sh.writeStudentsSheet(bestStudents, i);
+                SheetHelper.WriteStudentsSheet(bestStudents, i);
 
                 foreach (Block b in bestBlocks)
                 {

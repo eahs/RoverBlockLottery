@@ -4,24 +4,21 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace RoverBlock.Classes
+namespace RoverBlock
 {
-    class DataHelper
+    public static class DataHelper
     {
-        private static Random rnd = new Random();
-        private static SheetHelper sh = new SheetHelper();
-
-        public List<Student> getStudents(Dictionary<String, int> map, int grade)
+        public static List<Student> GetStudents(Dictionary<string, int> map, int grade)
         {
-            String fileName = "Students" + grade + ".xls";
+            string fileName = "Students" + grade + ".xls";
             List<Student> students = new List<Student>();
 
-            List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
-            foreach (Dictionary<String, String> entry in sheetData)
+            List<Dictionary<string, string>> sheetData = SheetHelper.ReadSheet(fileName, map);
+            foreach (Dictionary<string, string> entry in sheetData)
             {
-                String NetworkID = entry["NetworkID"].ToLower();
-                String LastName = entry["LastName"];
-                String FirstName = entry["FirstName"];
+                string NetworkID = entry["NetworkID"].ToLower();
+                string LastName = entry["LastName"];
+                string FirstName = entry["FirstName"];
 
                 Student s = new Student(NetworkID, FirstName, LastName);
 
@@ -31,16 +28,16 @@ namespace RoverBlock.Classes
             return students;
         }
 
-        public void loadStudentChoices(Dictionary<String, int> map, int grade, List<Student> students, List<Block> blocks)
+        public static void LoadStudentChoices(Dictionary<string, int> map, int grade, List<Student> students, List<Block> blocks)
         {
-            List<String> blockIntersect = blocks.Where(x => x.aSlots != 0 || x.bSlots != 0).Select(x => x.Name).ToList();
-            String fileName = "Choices" + grade + ".xls";
-            List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
-            foreach (Dictionary<String, String> entry in sheetData)
+            List<string> blockIntersect = blocks.Where(x => x.aSlots != 0 || x.bSlots != 0).Select(x => x.Name).ToList();
+            string fileName = "Choices" + grade + ".xls";
+            List<Dictionary<string, string>> sheetData = SheetHelper.ReadSheet(fileName, map);
+            foreach (Dictionary<string, string> entry in sheetData)
             {
-                String NetworkID = entry["NetworkID"].ToLower().Replace("@roverkids.org", "");
+                string NetworkID = entry["NetworkID"].ToLower().Replace("@roverkids.org", "");
 
-                List<String> choices = new List<String>()
+                List<string> choices = new List<string>()
                 {
                     entry["Choice1"],
                     entry["Choice2"],
@@ -59,15 +56,15 @@ namespace RoverBlock.Classes
             }
         }
 
-        public void lockStudents(String fileName, Dictionary<String, int> map, List<Student> students)
+        public static void LockStudents(string fileName, Dictionary<string, int> map, List<Student> students)
         {
-            List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
-            foreach (Dictionary<String, String> entry in sheetData)
+            List<Dictionary<string, string>> sheetData = SheetHelper.ReadSheet(fileName, map);
+            foreach (Dictionary<string, string> entry in sheetData)
             {
-                String NetworkID = entry["NetworkID"].ToLower();
-                String BlockID = "RESERVED"; // entry["BlockID"];
-                String BlockName = "RESERVED";
-                String Day = entry["Day"];
+                string NetworkID = entry["NetworkID"].ToLower();
+                string BlockID = "RESERVED"; // entry["BlockID"];
+                string BlockName = "RESERVED";
+                string Day = entry["Day"];
                 
 
                 if (NetworkID != "")
@@ -91,28 +88,28 @@ namespace RoverBlock.Classes
             }
         }
 
-        public List<Block> getBlocks(Dictionary<String, int> map, int grade)
+        public static List<Block> GetBlocks(Dictionary<string, int> map, int grade, Random rnd)
         {
-            String fileName = "Blocks" + grade + ".xls";
+            string fileName = "Blocks" + grade + ".xls";
             List<Block> blocks = new List<Block>();
 
-            List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
-            foreach (Dictionary<String, String> entry in sheetData)
+            List<Dictionary<string, string>> sheetData = SheetHelper.ReadSheet(fileName, map);
+            foreach (Dictionary<string, string> entry in sheetData)
             {
-                String BlockID = entry["Block ID"];
-                String BlockName = entry["Block Name"].Trim();
+                string BlockID = entry["Block ID"];
+                string BlockName = entry["Block Name"].Trim();
 
-                int aSlots = tryParse(entry["A Slots"]);
-                int bSlots = tryParse(entry["B Slots"]);
+                int aSlots = TryParse(entry["A Slots"]);
+                int bSlots = TryParse(entry["B Slots"]);
 
                 blocks.Add(new Block(BlockID, BlockName, aSlots, bSlots));
             }
 
-            shuffle(blocks);
+            Shuffle(blocks, rnd);
             return blocks;
         }
 
-        public void runLotteryA(Block b, List<Student> students)
+        public static void RunLotteryA(Block b, List<Student> students, Random rnd)
         {
             List<Student> interestedStudents = students.Where(x => x.Choices != null && x.A == null && x.Choices.Contains(b.Name)).ToList();
             List<Student> pool = new List<Student>();
@@ -140,7 +137,7 @@ namespace RoverBlock.Classes
             }
         }
 
-        public void runLotteryB(Block b, List<Student> students)
+        public static void RunLotteryB(Block b, List<Student> students, Random rnd)
         {
             List<Student> interestedStudents = students.Where(x => x.Choices != null && x.B == null && x.Choices.Contains(b.Name)).ToList();
             List<Student> pool = new List<Student>();
@@ -168,7 +165,7 @@ namespace RoverBlock.Classes
             }
         }
 
-        public void assignRemaining(List<Student> students, List<Block> blocks)
+        public static void AssignRemaining(List<Student> students, List<Block> blocks, Random rnd)
         {
             List<Block> aBlocks = blocks.Where(x => x.aSlots != 0).ToList();
             List<Block> bBlocks = blocks.Where(x => x.bSlots != 0).ToList();
@@ -207,12 +204,12 @@ namespace RoverBlock.Classes
             }
         }
 
-        public int tryParse(String str)
+        public static int TryParse(string str)
         {
             return int.TryParse(str, out int result) ? result : 0;
         }
 
-        public void shuffle<T>(List<T> list)
+        public static void Shuffle<T>(List<T> list, Random rnd)
         {
             int n = list.Count;
             while (n > 1)
@@ -225,7 +222,7 @@ namespace RoverBlock.Classes
             }
         }
 
-        public T DeepCopy<T>(T obj)
+        public static T DeepCopy<T>(T obj)
         {
             using (MemoryStream stream = new MemoryStream())
             {

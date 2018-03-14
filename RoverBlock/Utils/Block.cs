@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RoverBlock
 {
     [Serializable]
-    class Block
+    public class Block
     {
-        public String ID;
-        public String Name;
+        public string ID;
+        public string Name;
         public int aSlots;
         public int bSlots;
 
-        public Block(String ID, String Name, int aSlots, int bSlots)
+        public Block(string ID, string Name, int aSlots, int bSlots)
         {
             this.ID = ID;
             this.Name = Name;

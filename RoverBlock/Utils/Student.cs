@@ -7,21 +7,21 @@ using System.Threading.Tasks;
 namespace RoverBlock
 {
     [Serializable]
-    class Student
+    public class Student
     {
         // id is the network id of the student. (eg. greenec)
-        public String NetworkID;
-        public String FirstName;
-        public String LastName;
+        public string NetworkID;
+        public string FirstName;
+        public string LastName;
 
         // the student's assigned classes
         public Block A;
         public Block B;
 
         // the student's class choices
-        public List<String> Choices;
+        public List<string> Choices;
 
-        public Student(String NetworkID, String FirstName, String LastName)
+        public Student(string NetworkID, string FirstName, string LastName)
         {
             this.NetworkID = NetworkID;
             this.FirstName = FirstName;

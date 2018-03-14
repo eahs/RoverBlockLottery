@@ -1,31 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace RoverBlock.Classes
+namespace RoverBlock
 {
-    class ReconHelper
+    public static class ReconHelper
     {
-        private static SheetHelper sh = new SheetHelper();
-
         // TODO: don't use Intersect when loading in choice data for interest, use distinct instead
-        public void countChoices(Dictionary<String, int> map, int grade, List<Student> students)
+        public static void CountChoices(Dictionary<string, int> map, int grade, List<Student> students)
         {
-            String fileName = "Choices" + grade + ".xls";
-            List<Dictionary<String, int>> choiceCounts = new List<Dictionary<string, int>>()
+            string fileName = "Choices" + grade + ".xls";
+            List<Dictionary<string, int>> choiceCounts = new List<Dictionary<string, int>>()
             {
-                new Dictionary<String, int>(),
-                new Dictionary<String, int>(),
-                new Dictionary<String, int>(),
-                new Dictionary<String, int>()
+                new Dictionary<string, int>(),
+                new Dictionary<string, int>(),
+                new Dictionary<string, int>(),
+                new Dictionary<string, int>()
             };
 
-            List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
-            foreach (Dictionary<String, String> entry in sheetData)
+            List<Dictionary<string, string>> sheetData = SheetHelper.ReadSheet(fileName, map);
+            foreach (Dictionary<string, string> entry in sheetData)
             {
-                String NetworkID = entry["NetworkID"].ToLower().Replace("@roverkids.org", "");
+                string NetworkID = entry["NetworkID"].ToLower().Replace("@roverkids.org", "");
                 Student s = students.Where(x => x.NetworkID == NetworkID).FirstOrDefault();
 
                 if (s == null)
@@ -39,11 +34,11 @@ namespace RoverBlock.Classes
                     continue;
                 }
 
-                List<String> choices = s.Choices;
+                List<string> choices = s.Choices;
 
                 for (int i = 0; i < choices.Count; i++)
                 {
-                    String className = choices[i];
+                    string className = choices[i];
                     if (!choiceCounts[i].ContainsKey(className))
                     {
                         choiceCounts[i].Add(className, 1);
@@ -55,10 +50,10 @@ namespace RoverBlock.Classes
                 }
             }
 
-            sh.writeChoicesSheet(choiceCounts, grade);
+            SheetHelper.WriteChoicesSheet(choiceCounts, grade);
         }
 
-        public void noChoiceStudents(List<Student> students, int grade)
+        public static void NoChoiceStudents(List<Student> students, int grade)
         {
             List<Student> noChoices = new List<Student>();
 
@@ -76,23 +71,23 @@ namespace RoverBlock.Classes
                 }
             }
 
-            sh.writeNoChoicesSheet(noChoices, grade);
+            SheetHelper.WriteNoChoicesSheet(noChoices, grade);
         }
 
-        public void wallOfShame(Dictionary<String, int> map, int grade)
+        public static void WallOfShame(Dictionary<string, int> map, int grade)
         {
             List<Student> students = new List<Student>();
 
-            String fileName = "Choices" + grade + ".xls";
-            List<Dictionary<String, String>> sheetData = sh.readSheet(fileName, map);
+            string fileName = "Choices" + grade + ".xls";
+            List<Dictionary<string, string>> sheetData = SheetHelper.ReadSheet(fileName, map);
 
-            foreach (Dictionary<String, String> entry in sheetData)
+            foreach (Dictionary<string, string> entry in sheetData)
             {
-                String NetworkID = entry["NetworkID"].ToLower().Replace("@roverkids.org", "");
-                String LastName = entry["LastName"];
-                String FirstName = entry["FirstName"];
+                string NetworkID = entry["NetworkID"].ToLower().Replace("@roverkids.org", "");
+                string LastName = entry["LastName"];
+                string FirstName = entry["FirstName"];
 
-                List<String> choices = new List<String>()
+                List<string> choices = new List<string>()
                 {
                     entry["Choice1"],
                     entry["Choice2"],
@@ -108,7 +103,7 @@ namespace RoverBlock.Classes
                 }
             }
 
-            sh.writeWallOfShame(students, grade);
+            SheetHelper.WriteWallOfShame(students, grade);
         }
     }
 }
