@@ -17,8 +17,8 @@ namespace RoverBlock
             foreach (Dictionary<string, string> entry in sheetData)
             {
                 string NetworkID = entry["NetworkID"].ToLower();
-                string LastName = entry["LastName"];
-                string FirstName = entry["FirstName"];
+                string LastName = entry.ContainsKey("LastName") ? entry["LastName"] : "";
+                string FirstName = entry.ContainsKey("FirstName") ? entry["FirstName"] : "";
 
                 Student s = new Student(NetworkID, FirstName, LastName);
 
@@ -28,9 +28,13 @@ namespace RoverBlock
             return students;
         }
 
-        public static void LoadStudentChoices(Dictionary<string, int> map, int grade, List<Student> students, List<Block> blocks)
+        public static void LoadStudentChoices(Dictionary<string, int> map, int grade, List<Student> students, List<Block> blocks = null)
         {
-            List<string> blockIntersect = blocks.Where(x => x.aSlots != 0 || x.bSlots != 0).Select(x => x.Name).ToList();
+            if(blocks != null)
+            {
+                List<string> blockIntersect = blocks.Where(b => b.Slots != 0).Select(x => x.Name).ToList();
+            }
+
             string fileName = "Choices" + grade + ".xls";
             List<Dictionary<string, string>> sheetData = SheetHelper.ReadSheet(fileName, map);
             foreach (Dictionary<string, string> entry in sheetData)
@@ -64,9 +68,7 @@ namespace RoverBlock
                 string NetworkID = entry["NetworkID"].ToLower();
                 string BlockID = "RESERVED"; // entry["BlockID"];
                 string BlockName = "RESERVED";
-                string Day = entry["Day"];
                 
-
                 if (NetworkID != "")
                 {
                     Student s = students.Where(x => x.NetworkID == NetworkID).FirstOrDefault();
@@ -76,14 +78,7 @@ namespace RoverBlock
                         continue;
                     }
 
-                    if (Day == "A")
-                    {
-                        s.A = new Block(BlockID, BlockName, 0, 0); ;
-                    }
-                    else if (Day == "B")
-                    {
-                        s.B = new Block(BlockID, BlockName, 0, 0); ;
-                    }
+                    s.RoverBlock = new Block(BlockID, BlockName, 0);
                 }
             }
         }
@@ -99,19 +94,18 @@ namespace RoverBlock
                 string BlockID = entry["Block ID"];
                 string BlockName = entry["Block Name"].Trim();
 
-                int aSlots = TryParse(entry["A Slots"]);
-                int bSlots = TryParse(entry["B Slots"]);
+                int slots = TryParse(entry["Slots"]);
 
-                blocks.Add(new Block(BlockID, BlockName, aSlots, bSlots));
+                blocks.Add(new Block(BlockID, BlockName, slots));
             }
 
             Shuffle(blocks, rnd);
             return blocks;
         }
 
-        public static void RunLotteryA(Block b, List<Student> students, Random rnd)
+        public static void RunLottery(Block b, List<Student> students, Random rnd)
         {
-            List<Student> interestedStudents = students.Where(x => x.Choices != null && x.A == null && x.Choices.Contains(b.Name)).ToList();
+            List<Student> interestedStudents = students.Where(s => s.Choices != null && s.RoverBlock == null && s.Choices.Contains(b.Name)).ToList();
             List<Student> pool = new List<Student>();
 
             foreach (Student s in interestedStudents)
@@ -121,7 +115,7 @@ namespace RoverBlock
 
             interestedStudents = null;
 
-            while (b.aSlots > 0)
+            while (b.Slots > 0)
             {
                 if (pool.Count == 0)
                 {
@@ -130,74 +124,29 @@ namespace RoverBlock
 
                 Student winner = pool[rnd.Next(pool.Count)];
                 winner.Choices.Remove(b.Name);
-                winner.A = b;
+                winner.RoverBlock = b;
                 pool.RemoveAll(x => x.NetworkID == winner.NetworkID);
 
-                b.aSlots--;
-            }
-        }
-
-        public static void RunLotteryB(Block b, List<Student> students, Random rnd)
-        {
-            List<Student> interestedStudents = students.Where(x => x.Choices != null && x.B == null && x.Choices.Contains(b.Name)).ToList();
-            List<Student> pool = new List<Student>();
-
-            foreach (Student s in interestedStudents)
-            {
-                pool.AddRange(Enumerable.Repeat(s, 4 - s.Choices.IndexOf(b.Name)));
-            }
-
-            interestedStudents = null;
-
-            while (b.bSlots > 0)
-            {
-                if (pool.Count == 0)
-                {
-                    break;
-                }
-
-                Student winner = pool[rnd.Next(pool.Count)];
-                winner.Choices.Remove(b.Name);
-                winner.B = b;
-                pool.RemoveAll(x => x.NetworkID == winner.NetworkID);
-
-                b.bSlots--;
+                b.Slots--;
             }
         }
 
         public static void AssignRemaining(List<Student> students, List<Block> blocks, Random rnd)
         {
-            List<Block> aBlocks = blocks.Where(x => x.aSlots != 0).ToList();
-            List<Block> bBlocks = blocks.Where(x => x.bSlots != 0).ToList();
+            List<Block> OpenBlocks = blocks.Where(b => b.Slots != 0).ToList();
 
-            foreach (Student s in students.Where(x => x.Choices != null && (x.A == null || x.B == null)))
+            foreach (Student s in students.Where(s => s.Choices != null && (s.RoverBlock == null)))
             {
-                if(s.A == null)
+                if(s.RoverBlock == null)
                 {
-                    if (aBlocks.Count != 0)
+                    if (OpenBlocks.Count != 0)
                     {
-                        Block b = aBlocks[rnd.Next(aBlocks.Count)];
-                        s.A = b;
-                        b.aSlots--;
+                        Block b = OpenBlocks[rnd.Next(OpenBlocks.Count)];
+                        s.RoverBlock = b;
 
-                        if (b.aSlots == 0)
+                        if (b.Slots == 0)
                         {
-                            aBlocks.Remove(b);
-                        }
-                    }
-                }
-
-                if (s.B == null)
-                {
-                    if (bBlocks.Count != 0)
-                    {
-                        Block b = bBlocks[rnd.Next(bBlocks.Count)];
-                        s.B = b;
-                        b.bSlots--;
-
-                        if (b.bSlots == 0)
-                        {
-                            bBlocks.Remove(b);
+                            OpenBlocks.Remove(b);
                         }
                     }
                 }

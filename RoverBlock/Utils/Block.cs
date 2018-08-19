@@ -7,15 +7,13 @@ namespace RoverBlock
     {
         public string ID;
         public string Name;
-        public int aSlots;
-        public int bSlots;
+        public int Slots;
 
-        public Block(string ID, string Name, int aSlots, int bSlots)
+        public Block(string ID, string Name, int slots)
         {
             this.ID = ID;
             this.Name = Name;
-            this.aSlots = aSlots;
-            this.bSlots = bSlots;
+            this.Slots = slots;
         }
     }
 }

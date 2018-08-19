@@ -15,8 +15,7 @@ namespace RoverBlock
         public string LastName;
 
         // the student's assigned classes
-        public Block A;
-        public Block B;
+        public Block RoverBlock;
 
         // the student's class choices
         public List<string> Choices;

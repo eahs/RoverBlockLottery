@@ -28,8 +28,8 @@ namespace RoverBlock
                     continue;
                 }
 
-                // don't count a student's choices if they are locked into two classes already
-                if(s.A != null && s.B != null)
+                // don't count a student's choices if they are locked in already
+                if(s.RoverBlock != null)
                 {
                     continue;
                 }
@@ -59,8 +59,8 @@ namespace RoverBlock
 
             foreach (Student s in students)
             {
-                // don't count a student's choices if they are locked into two classes already
-                if (s.A != null && s.B != null)
+                // don't count a student's choices if they are locked in already
+                if (s.RoverBlock != null)
                 {
                     continue;
                 }
