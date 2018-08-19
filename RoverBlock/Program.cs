@@ -79,16 +79,13 @@ namespace RoverBlock
                             onsole.WriteLine("No grade " + i + " student voted for " + b.Name);
                         } */
 
-                        DataHelper.RunLotteryA(b, students, rnd);
-                        DataHelper.RunLotteryB(b, students, rnd);
+                        DataHelper.RunLottery(b, students, rnd);
 
                         // remove class from all students who did not win the lottery to promte their other choices
                         students.Where(x => x.Choices != null).Select(x => { x.Choices.Remove(b.Name); return x; }).ToList();
                     }
 
-
-
-                    int newScore = students.Where(x => x.Choices != null && x.A == null).Count() + students.Where(x => x.Choices != null && x.B == null).Count();
+                    int newScore = students.Where(x => x.Choices != null && x.RoverBlock == null).Count();
 
                     if (newScore < score)
                     {
