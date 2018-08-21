@@ -16,8 +16,7 @@ namespace RoverBlock
             {
                 { "Block ID", 0 },
                 { "Block Name", 1 },
-                { "A Slots", 2 },
-                { "B Slots", 3 }
+                { "Slots", 2 },
             };
 
             Dictionary<string, int> studentsMap = new Dictionary<string, int>()
@@ -36,13 +35,13 @@ namespace RoverBlock
 
             Dictionary<string, int> studentChoiceMap = new Dictionary<string, int>()
             {
-                { "LastName", 1 },
-                { "FirstName", 2 },
-                { "NetworkID", 8 },
-                { "Choice1", 4 },
-                { "Choice2", 5 },
-                { "Choice3", 6 },
-                { "Choice4", 7 }
+                { "LastName", 0 },
+                { "FirstName", 1 },
+                { "NetworkID", 7 },
+                { "Choice1", 3 },
+                { "Choice2", 4 },
+                { "Choice3", 5 },
+                { "Choice4", 6 }
             };
 
             for (int i = 9; i < 12; i++)
@@ -57,8 +56,8 @@ namespace RoverBlock
                 // load in data from sheets
                 List<Block> baseBlocks = DataHelper.GetBlocks(blocksMap, i, rnd);
                 List<Student> baseStudents = DataHelper.GetStudents(studentsMap, i);
-                DataHelper.LockStudents("LockedStudents.xls", lockedStudentsMap, baseStudents);
-                DataHelper.LoadStudentChoices(studentChoiceMap, i, baseStudents, baseBlocks);
+                // DataHelper.LockStudents("LockedStudents.xls", lockedStudentsMap, baseStudents);
+                DataHelper.LoadStudentChoices(studentChoiceMap, i, baseStudents);
 
                 // reconnaissance to make sense of certain data points
                 ReconHelper.CountChoices(studentChoiceMap, i, baseStudents);
@@ -80,16 +79,13 @@ namespace RoverBlock
                             onsole.WriteLine("No grade " + i + " student voted for " + b.Name);
                         } */
 
-                        DataHelper.RunLotteryA(b, students, rnd);
-                        DataHelper.RunLotteryB(b, students, rnd);
+                        DataHelper.RunLottery(b, students, rnd);
 
                         // remove class from all students who did not win the lottery to promte their other choices
                         students.Where(x => x.Choices != null).Select(x => { x.Choices.Remove(b.Name); return x; }).ToList();
                     }
 
-
-
-                    int newScore = students.Where(x => x.Choices != null && x.A == null).Count() + students.Where(x => x.Choices != null && x.B == null).Count();
+                    int newScore = students.Where(x => x.Choices != null && x.RoverBlock == null).Count();
 
                     if (newScore < score)
                     {
@@ -99,24 +95,20 @@ namespace RoverBlock
                     }
                 }
 
-                // dh.assignRemaining(bestStudents, bestBlocks);
+                // DataHelper.AssignRemaining(bestStudents, bestBlocks, rnd);
 
                 // output to XLS file
                 SheetHelper.WriteStudentsSheet(bestStudents, i);
 
                 foreach (Block b in bestBlocks)
                 {
-                    int sumSlots = b.aSlots + b.bSlots;
-
-                    if (sumSlots != 0)
+                    if (b.Slots != 0)
                     {
-                        output += sumSlots + " slots open in " + b.Name + "\n";
+                        output += b.Slots + " slots open in " + b.Name + "\n";
                     }
                 }
-
-                output += "A unscheduled: " + bestStudents.Where(x => x.Choices != null && x.A == null).Count() + "\n";
-                output += "B unscheduled: " + bestStudents.Where(x => x.Choices != null && x.B == null).Count() + "\n";
-                output += "Grade " + i + " score: " + score + " (lower is better)\n\n";
+                
+                output += "Grade " + i + " unscheduled: " + bestStudents.Where(x => x.RoverBlock == null).Count() + "\n\n";
             }
 
             Console.WriteLine();

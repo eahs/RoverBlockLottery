@@ -34,7 +34,11 @@ namespace RoverBlock
 
                     foreach (KeyValuePair<string, int> entry in map)
                     {
-                        dict.Add(entry.Key, cells[entry.Value].ToString());
+                        // avoid index out of range when reading spreadsheet data
+                        if(cells.Count > entry.Value)
+                        {
+                            dict.Add(entry.Key, cells[entry.Value].ToString());
+                        }
                     }
 
                     output.Add(dict);
@@ -52,19 +56,15 @@ namespace RoverBlock
 
             IRow header = sheet.CreateRow(0);
             header.CreateCell(0).SetCellValue("Network ID");
-            header.CreateCell(1).SetCellValue("A Day Class ID");
-            header.CreateCell(2).SetCellValue("B Day Class ID");
-            header.CreateCell(3).SetCellValue("A Day Class Name");
-            header.CreateCell(4).SetCellValue("B Day Class Name");
+            header.CreateCell(1).SetCellValue("Class ID");
+            header.CreateCell(2).SetCellValue("Class Name");
             for (int i = 0; i < students.Count; i++)
             {
                 Student student = students[i];
                 IRow row = sheet.CreateRow(i + 1);
                 row.CreateCell(0).SetCellValue(student.NetworkID);
-                row.CreateCell(1).SetCellValue(student.A == null ? "" : student.A.ID);
-                row.CreateCell(2).SetCellValue(student.B == null ? "" : student.B.ID);
-                row.CreateCell(3).SetCellValue(student.A == null ? "" : student.A.Name);
-                row.CreateCell(4).SetCellValue(student.B == null ? "" : student.B.Name);
+                row.CreateCell(1).SetCellValue(student.RoverBlock == null ? "" : student.RoverBlock.ID);
+                row.CreateCell(2).SetCellValue(student.RoverBlock == null ? "" : student.RoverBlock.Name);
             }
             for (int i = 0; i < 5; i++)
             {
