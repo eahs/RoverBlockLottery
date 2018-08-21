@@ -54,7 +54,7 @@ namespace RoverBlock
                 List<Block> bestBlocks = new List<Block>();
 
                 // load in data from sheets
-                // List<Block> baseBlocks = DataHelper.GetBlocks(blocksMap, i, rnd);
+                List<Block> baseBlocks = DataHelper.GetBlocks(blocksMap, i, rnd);
                 List<Student> baseStudents = DataHelper.GetStudents(studentsMap, i);
                 // DataHelper.LockStudents("LockedStudents.xls", lockedStudentsMap, baseStudents);
                 DataHelper.LoadStudentChoices(studentChoiceMap, i, baseStudents);
@@ -95,7 +95,7 @@ namespace RoverBlock
                     }
                 }
 
-                // dh.assignRemaining(bestStudents, bestBlocks);
+                // DataHelper.AssignRemaining(bestStudents, bestBlocks);
 
                 // output to XLS file
                 SheetHelper.WriteStudentsSheet(bestStudents, i);
@@ -107,9 +107,8 @@ namespace RoverBlock
                         output += b.Slots + " slots open in " + b.Name + "\n";
                     }
                 }
-
-                output += "Unscheduled: " + bestStudents.Where(x => x.Choices != null && x.RoverBlock == null).Count() + "\n";
-                output += "Grade " + i + " score: " + score + " (lower is better)\n\n";
+                
+                output += "Grade " + i + " unscheduled: " + bestStudents.Where(x => x.RoverBlock == null).Count() + "\n\n";
             }
 
             Console.WriteLine();

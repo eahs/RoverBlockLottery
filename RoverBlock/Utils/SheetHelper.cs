@@ -56,10 +56,8 @@ namespace RoverBlock
 
             IRow header = sheet.CreateRow(0);
             header.CreateCell(0).SetCellValue("Network ID");
-            header.CreateCell(1).SetCellValue("A Day Class ID");
-            header.CreateCell(2).SetCellValue("B Day Class ID");
-            header.CreateCell(3).SetCellValue("A Day Class Name");
-            header.CreateCell(4).SetCellValue("B Day Class Name");
+            header.CreateCell(1).SetCellValue("Class ID");
+            header.CreateCell(2).SetCellValue("Class Name");
             for (int i = 0; i < students.Count; i++)
             {
                 Student student = students[i];
