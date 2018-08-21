@@ -95,7 +95,7 @@ namespace RoverBlock
                     }
                 }
 
-                // DataHelper.AssignRemaining(bestStudents, bestBlocks);
+                // DataHelper.AssignRemaining(bestStudents, bestBlocks, rnd);
 
                 // output to XLS file
                 SheetHelper.WriteStudentsSheet(bestStudents, i);
