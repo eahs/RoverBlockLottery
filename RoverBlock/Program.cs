@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -57,7 +57,7 @@ namespace RoverBlock
                 List<Block> baseBlocks = DataHelper.GetBlocks(blocksMap, i, rnd);
                 List<Student> baseStudents = DataHelper.GetStudents(studentsMap, i);
                 // DataHelper.LockStudents("LockedStudents.xls", lockedStudentsMap, baseStudents);
-                DataHelper.LoadStudentChoices(studentChoiceMap, i, baseStudents);
+                DataHelper.LoadStudentChoices(studentChoiceMap, i, baseStudents, baseBlocks);
 
                 // reconnaissance to make sense of certain data points
                 ReconHelper.CountChoices(studentChoiceMap, i, baseStudents);

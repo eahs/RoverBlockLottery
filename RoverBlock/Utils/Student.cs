@@ -1,30 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RoverBlock
 {
     [Serializable]
     public class Student
     {
-        // id is the network id of the student. (eg. greenec)
-        public string NetworkID;
-        public string FirstName;
-        public string LastName;
+        public string NetworkID { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+        public int LotteryScore { get; set; } = 0;
 
         // the student's assigned classes
-        public Block RoverBlock;
+        public Block RoverBlock { get; set; }
 
         // the student's class choices
         public List<string> Choices;
-
-        public Student(string NetworkID, string FirstName, string LastName)
-        {
-            this.NetworkID = NetworkID;
-            this.FirstName = FirstName;
-            this.LastName = LastName;
-        }
     }
 }

@@ -38,6 +38,8 @@ namespace RoverBlock
 
                 for (int i = 0; i < choices.Count; i++)
                 {
+                    if (choices[i] == null) continue;
+
                     string className = choices[i];
                     if (!choiceCounts[i].ContainsKey(className))
                     {
@@ -97,8 +99,11 @@ namespace RoverBlock
 
                 if(choices.Distinct().Count() != 4)
                 {
-                    Student s = new Student(NetworkID, FirstName, LastName)
+                    Student s = new Student
                     {
+                        NetworkID = NetworkID,
+                        FirstName = FirstName,
+                        LastName = LastName,
                         Choices = choices.GroupBy(x => x).Where(g => g.Count() > 1).Select(y => y.Key).ToList()
                     };
                     students.Add(s);
