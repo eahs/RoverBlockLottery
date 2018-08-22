@@ -59,6 +59,7 @@ namespace RoverBlock
 
                 if(blocks != null)
                 {
+                    // if doing recon, comment this out
                     choices = choices.Intersect(blockIntersect).ToList();
                 }
 
