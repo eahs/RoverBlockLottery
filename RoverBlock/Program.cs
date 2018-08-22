@@ -85,7 +85,6 @@ namespace RoverBlock
                         students.Where(x => x.Choices != null).Select(s => { s.Choices.Remove(b.Name); return s; }).ToList();
                     }
 
-                    // int newScore = students.Where(x => x.Choices != null && x.RoverBlock == null).Count();
                     int newScore = students.Select(x => x.LotteryScore).Sum();
 
                     if (newScore > score)
