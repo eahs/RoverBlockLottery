@@ -1,4 +1,4 @@
-using RoverBlock.Utils;
+﻿using RoverBlock.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -138,7 +138,13 @@ namespace RoverBlock
                 }
 
                 Student winner = pool[rnd.Next(pool.Count)];
-                winner.Choices.Remove(b.Name);
+
+                int choiceIdx = winner.Choices.IndexOf(b.Name);
+
+                // assign a score based on the priority of the student's choice
+                winner.LotteryScore = 4 - choiceIdx;
+
+                winner.Choices[choiceIdx] = null;
                 winner.RoverBlock = b;
                 pool.RemoveAll(x => x.NetworkID == winner.NetworkID);
 
