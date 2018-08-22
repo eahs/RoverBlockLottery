@@ -49,7 +49,7 @@ namespace RoverBlock
                 Console.WriteLine("Grade " + i + " starting.");
 
                 // initialize variables for scoring
-                int score = int.MaxValue;
+                int score = int.MinValue;
                 List<Student> bestStudents = new List<Student>();
                 List<Block> bestBlocks = new List<Block>();
 
@@ -57,7 +57,7 @@ namespace RoverBlock
                 List<Block> baseBlocks = DataHelper.GetBlocks(blocksMap, i, rnd);
                 List<Student> baseStudents = DataHelper.GetStudents(studentsMap, i);
                 // DataHelper.LockStudents("LockedStudents.xls", lockedStudentsMap, baseStudents);
-                DataHelper.LoadStudentChoices(studentChoiceMap, i, baseStudents);
+                DataHelper.LoadStudentChoices(studentChoiceMap, i, baseStudents, baseBlocks);
 
                 // reconnaissance to make sense of certain data points
                 ReconHelper.CountChoices(studentChoiceMap, i, baseStudents);
@@ -82,12 +82,12 @@ namespace RoverBlock
                         DataHelper.RunLottery(b, students, rnd);
 
                         // remove class from all students who did not win the lottery to promte their other choices
-                        students.Where(x => x.Choices != null).Select(x => { x.Choices.Remove(b.Name); return x; }).ToList();
+                        students.Where(x => x.Choices != null).Select(s => { s.Choices.Remove(b.Name); return s; }).ToList();
                     }
 
-                    int newScore = students.Where(x => x.Choices != null && x.RoverBlock == null).Count();
+                    int newScore = students.Select(x => x.LotteryScore).Sum();
 
-                    if (newScore < score)
+                    if (newScore > score)
                     {
                         bestStudents = students.ConvertAll(x => DataHelper.DeepCopy(x));
                         bestBlocks = blocks.ConvertAll(x => DataHelper.DeepCopy(x));
@@ -107,7 +107,8 @@ namespace RoverBlock
                         output += b.Slots + " slots open in " + b.Name + "\n";
                     }
                 }
-                
+
+                output += "Score: " + score + "\n";
                 output += "Grade " + i + " unscheduled: " + bestStudents.Where(x => x.RoverBlock == null).Count() + "\n\n";
             }
 

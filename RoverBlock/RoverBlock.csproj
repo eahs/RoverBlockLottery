@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Utils\Block.cs" />
     <Compile Include="Utils\DataHelper.cs" />
+    <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\SheetHelper.cs" />
     <Compile Include="Utils\ReconHelper.cs" />
     <Compile Include="Program.cs" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RoverBlock.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,7 +21,12 @@ namespace RoverBlock
                 string LastName = entry.ContainsKey("LastName") ? entry["LastName"] : "";
                 string FirstName = entry.ContainsKey("FirstName") ? entry["FirstName"] : "";
 
-                Student s = new Student(NetworkID, FirstName, LastName);
+                Student s = new Student
+                {
+                    NetworkID = NetworkID,
+                    FirstName = FirstName,
+                    LastName = LastName
+                };
 
                 students.Add(s);
             }
@@ -30,9 +36,11 @@ namespace RoverBlock
 
         public static void LoadStudentChoices(Dictionary<string, int> map, int grade, List<Student> students, List<Block> blocks = null)
         {
+            List<string> blockIntersect = null;
+
             if(blocks != null)
             {
-                List<string> blockIntersect = blocks.Where(b => b.Slots != 0).Select(x => x.Name).ToList();
+                blockIntersect = blocks.Where(b => b.Slots != 0).Select(x => x.Name).ToList();
             }
 
             string fileName = "Choices" + grade + ".xls";
@@ -47,7 +55,15 @@ namespace RoverBlock
                     entry["Choice2"],
                     entry["Choice3"],
                     entry["Choice4"]
-                }.Distinct().ToList(); // .Intersect(blockIntersect)
+                }.Distinct().ToList();
+
+                if(blocks != null)
+                {
+                    // if doing recon, comment this out
+                    choices = choices.Intersect(blockIntersect).ToList();
+                }
+
+                choices = choices.PadLeft(4, null).ToList();
 
                 Student s = students.Where(x => x.NetworkID == NetworkID).FirstOrDefault();
 
@@ -123,7 +139,13 @@ namespace RoverBlock
                 }
 
                 Student winner = pool[rnd.Next(pool.Count)];
-                winner.Choices.Remove(b.Name);
+
+                int choiceIdx = winner.Choices.IndexOf(b.Name);
+
+                // assign a score based on the priority of the student's choice
+                winner.LotteryScore = 4 - choiceIdx;
+
+                winner.Choices[choiceIdx] = null;
                 winner.RoverBlock = b;
                 pool.RemoveAll(x => x.NetworkID == winner.NetworkID);
 
