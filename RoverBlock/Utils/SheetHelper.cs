@@ -1,6 +1,8 @@
 ﻿using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
+using NPOI.SS.Util;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -32,12 +34,27 @@ namespace RoverBlock
 
                     Dictionary<string, string> dict = new Dictionary<string, string>();
 
+                    // The cells list doesn't necessary match up with what you see in excel, particularly if columns are left blank
+                    Dictionary<int, int> columnIndexKeys = new Dictionary<int, int>();
+                    int i = 0;
+                    foreach (ICell cell in cells)
+                    {
+                        columnIndexKeys.Add(cell.ColumnIndex, i);
+                        i++;
+                    }
+
                     foreach (KeyValuePair<string, int> entry in map)
                     {
                         // avoid index out of range when reading spreadsheet data
-                        if(cells.Count > entry.Value)
+                        if(columnIndexKeys.ContainsKey(entry.Value))
                         {
-                            dict.Add(entry.Key, cells[entry.Value].ToString());
+                            Debug.Assert(cells[columnIndexKeys[entry.Value]].ColumnIndex == entry.Value, "Column mismatch - did you leave a column blank?");
+                            
+                            dict.Add(entry.Key, cells[columnIndexKeys[entry.Value]].ToString());
+                        }
+                        else
+                        {
+                            dict.Add(entry.Key, "");
                         }
                     }
 
