@@ -9,6 +9,8 @@ namespace RoverBlock
 {
     public static class DataHelper
     {
+        public static int RankScaler = 4;
+
         public static List<Student> GetStudents(Dictionary<string, int> map, int grade)
         {
             string fileName = "Students" + grade + ".xls";
@@ -20,6 +22,9 @@ namespace RoverBlock
                 string NetworkID = entry["NetworkID"].ToLower();
                 string LastName = entry.ContainsKey("LastName") ? entry["LastName"] : "";
                 string FirstName = entry.ContainsKey("FirstName") ? entry["FirstName"] : "";
+
+                if (NetworkID == null || NetworkID == "")
+                    continue;
 
                 Student s = new Student
                 {
@@ -57,10 +62,25 @@ namespace RoverBlock
                     entry["Choice4"]
                 }.Distinct().ToList();
 
+                
                 if(blocks != null)
                 {
                     // if doing recon, comment this out
-                    choices = choices.Intersect(blockIntersect).ToList();
+                    List<string> choices2 = choices.Intersect(blockIntersect).ToList();
+
+                    if (choices.Count != choices2.Count)
+                    {
+                        // Spam errors
+                        foreach (string choice in choices)
+                        {
+                            if (!choices2.Contains(choice))
+                            {
+                                Console.WriteLine("Choice does not exist: {0}", choice);
+                            }
+                        }
+                    }
+
+                    choices = choices2;
                 }
 
                 choices = choices.PadLeft(4, null).ToList();
@@ -126,7 +146,10 @@ namespace RoverBlock
 
             foreach (Student s in interestedStudents)
             {
-                pool.AddRange(Enumerable.Repeat(s, 4 - s.Choices.IndexOf(b.Name)));
+                int rank = (4 - s.Choices.IndexOf(b.Name));
+                rank = (int)Math.Pow(RankScaler, rank);
+
+                pool.AddRange(Enumerable.Repeat(s, rank));
             }
 
             interestedStudents = null;
@@ -143,7 +166,7 @@ namespace RoverBlock
                 int choiceIdx = winner.Choices.IndexOf(b.Name);
 
                 // assign a score based on the priority of the student's choice
-                winner.LotteryScore = 4 - choiceIdx;
+                winner.LotteryScore = (int)Math.Pow(2, 4 - choiceIdx);
 
                 winner.Choices[choiceIdx] = null;
                 winner.RoverBlock = b;
@@ -157,7 +180,7 @@ namespace RoverBlock
         {
             List<Block> OpenBlocks = blocks.Where(b => b.Slots != 0).ToList();
 
-            foreach (Student s in students.Where(s => s.Choices != null && (s.RoverBlock == null)))
+            foreach (Student s in students.Where(s => /*s.Choices != null &&*/ s.RoverBlock == null))
             {
                 if(s.RoverBlock == null)
                 {

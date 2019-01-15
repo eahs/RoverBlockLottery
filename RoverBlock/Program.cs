@@ -49,6 +49,8 @@ namespace RoverBlock
                 Console.WriteLine("Grade " + i + " starting.");
 
                 // initialize variables for scoring
+                double efficiency = 0;
+                int totalStudents = 0;
                 int score = int.MinValue;
                 List<Student> bestStudents = new List<Student>();
                 List<Block> bestBlocks = new List<Block>();
@@ -64,8 +66,11 @@ namespace RoverBlock
                 ReconHelper.NoChoiceStudents(baseStudents, i);
                 ReconHelper.WallOfShame(studentChoiceMap, i);
 
+                Console.CursorVisible = false;
                 for (int j = 0; j < 1000; j++)
                 {
+                    Console.Write("\rTrying combination #{0}  |  Best Score: {1}", j, score.ToString().PadLeft(6));
+
                     // deep copy of the above blocks and students
                     List<Block> blocks = baseBlocks.ConvertAll(x => DataHelper.DeepCopy(x));
                     List<Student> students = baseStudents.ConvertAll(x => DataHelper.DeepCopy(x));
@@ -92,10 +97,19 @@ namespace RoverBlock
                         bestStudents = students.ConvertAll(x => DataHelper.DeepCopy(x));
                         bestBlocks = blocks.ConvertAll(x => DataHelper.DeepCopy(x));
                         score = newScore;
+                        totalStudents = students.Where(x => x.LotteryScore > 0).Count();
                     }
-                }
 
-                // DataHelper.AssignRemaining(bestStudents, bestBlocks, rnd);
+                    efficiency = (double)score / (Math.Pow(2, 4) * totalStudents) * 100;
+                    efficiency = Math.Round(efficiency, 3);
+
+                    Console.Write(" |  Latest Score: {0}  |  Efficiency: {1}%    ", newScore.ToString().PadLeft(6), efficiency);
+                }
+                Console.CursorVisible = true;
+
+                output += "Grade " + i + " unscheduled (Initial): " + bestStudents.Where(x => x.RoverBlock == null).Count() + "\n";
+
+                DataHelper.AssignRemaining(bestStudents, bestBlocks, rnd);
 
                 // output to XLS file
                 SheetHelper.WriteStudentsSheet(bestStudents, i);
@@ -109,10 +123,10 @@ namespace RoverBlock
                 }
 
                 output += "Score: " + score + "\n";
-                output += "Grade " + i + " unscheduled: " + bestStudents.Where(x => x.RoverBlock == null).Count() + "\n\n";
+                output += "Grade " + i + " unscheduled (Final): " + bestStudents.Where(x => x.RoverBlock == null).Count() + "\n\n";
             }
 
-            Console.WriteLine();
+            Console.WriteLine("\n");
 
             output = output.Trim();
 
