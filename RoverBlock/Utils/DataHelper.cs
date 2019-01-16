@@ -188,6 +188,7 @@ namespace RoverBlock
                     {
                         Block b = OpenBlocks[rnd.Next(OpenBlocks.Count)];
                         s.RoverBlock = b;
+                        b.Slots--;
 
                         if (b.Slots == 0)
                         {
